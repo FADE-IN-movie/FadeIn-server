@@ -1,5 +1,17 @@
 package utils;
 
+import PINAMO.FADEIN.data.object.movieObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,7 +104,131 @@ public class MovieUtil {
           break;
       }
     }
-
     return returnArrayList;
+  }
+
+  public String overviewTransducer(String type, int movieId) {
+    String path = type+"/"+movieId;
+
+    String url = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=en-US", path);
+
+    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+
+    JSONObject parser = restTemplateUtil.GetRestTemplate(url);
+
+    String overview = parser.getString("overview");
+
+    return overview;
+  }
+
+  public List<movieObject> getMovies(String type, String menu) {
+    String path = type + "/" + menu;
+
+    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko&page=1", path);
+
+    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+
+    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    JSONArray arrayList = parser.getJSONArray("results");
+
+    List<movieObject> return_movies = new ArrayList<>();
+
+    for (int i = 0; i < 10; i++) {
+      JSONObject detail = (JSONObject) arrayList.get(i);
+
+      MovieUtil movieUtil = new MovieUtil();
+
+      int movieId = detail.getInt("id");
+
+      String title;
+
+      if (type.equals("movie")) title = detail.getString("title");
+      else title = detail.getString("name");
+
+      String overview = detail.getString("overview");
+
+      if (overview.equals("")) {
+
+        overview = movieUtil.overviewTransducer(type, movieId);
+      }
+      JSONArray genre_ids = detail.getJSONArray("genre_ids");
+
+      ArrayList<Integer> genres = new ArrayList<>();
+
+      for (int j = 0; j<genre_ids.length(); j++) {
+        genres.add((int) genre_ids.get(j));
+      }
+
+      ArrayList<String> return_genres = movieUtil.GenreTransducer(genres);
+
+      String poster = "https://image.tmdb.org/t/p/w500" + detail.getString("poster_path");
+
+      movieObject movie;
+
+      if (menu.equals("popular") || menu.equals("top_rated")) {
+        movie = new movieObject(movieId, i+1, type, title, return_genres, poster, overview);
+      }
+      else movie = new movieObject(movieId, type, title, return_genres, poster, overview);
+
+      return_movies.add(movie);
+    }
+
+    return return_movies;
+  }
+
+  public String getMovieCertification(int movieId) {
+
+    String requestURL = String.format("https://api.themoviedb.org/3/movie/%s/release_dates?api_key=929a001736172a3578c0d6bf3b3cbbc5", movieId);
+
+    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+
+    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    JSONArray arrayList = parser.getJSONArray("results");
+
+    String krCertification = null;
+    String usCertification = null;
+
+    for (int i=0; i<arrayList.length(); i++) {
+      JSONObject temp = (JSONObject) arrayList.get(i);
+
+      String countryCode = temp.getString("iso_3166_1");
+      JSONArray certificationList = temp.getJSONArray("release_dates");
+      JSONObject certificationObject = (JSONObject) certificationList.get(0);
+      String certification = certificationObject.getString("certification");
+      
+      if ((countryCode.equals("KR") && !certification.equals(""))) krCertification = certification;
+      else if (countryCode.equals("US")) usCertification = certification;
+    }
+
+    if (!krCertification.equals(null)) return krCertification;
+    else return usCertification;
+  }
+
+  public String getTvCertification(int tvId) {
+
+    String requestURL = String.format("https://api.themoviedb.org/3/tv/%s/content_ratings?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", tvId);
+
+    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+
+    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    JSONArray arrayList = parser.getJSONArray("results");
+
+    String krCertification = null;
+    String usCertification = null;
+
+    for (int i = 0; i< arrayList.length(); i++) {
+      JSONObject result = (JSONObject) arrayList.get(i);
+
+      String countryCode = result.getString("iso_3166_1");
+
+      if (countryCode.equals("KR")) krCertification = result.getString("rating");
+      else if (countryCode.equals("US")) usCertification = result.getString("rating");
+    }
+
+    if (!krCertification.equals(null)) return krCertification;
+    else return usCertification;
   }
 }

@@ -1,5 +1,6 @@
 package PINAMO.FADEIN.data.dto.movie;
 
+import PINAMO.FADEIN.data.object.movieObject;
 import lombok.*;
 
 import java.util.List;
@@ -11,17 +12,11 @@ import java.util.List;
 @Builder
 public class mainPageDTO {
 
-  private List<Movie> popular;
-  private List<Movie> topRate;
-  private List<Movie> nowPlaying;
-  private List<Movie> preference;
-  private List<Movie> recommend;
+  private List<movieObject> popular;
+  private List<movieObject> topRate;
+  private List<movieObject> nowPlaying;
+  private List<movieObject> preference;
+  private List<movieObject> recommend;
 
-  public mainPageDTO(List<Movie> popular, List<Movie> topRate, List<Movie> nowPlaying, List<Movie> recommend) {
-    this.popular = popular;
-    this.topRate = topRate;
-    this.nowPlaying = nowPlaying;
-    this.recommend = recommend;
-  }
 }
 
