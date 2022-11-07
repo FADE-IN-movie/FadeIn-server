@@ -1,8 +1,13 @@
 package utils;
 
+import PINAMO.FADEIN.data.Entity.RecommendEntity;
+import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.handler.RecommendDataHandler;
+import PINAMO.FADEIN.handler.UserDataHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -187,8 +192,8 @@ public class MovieUtil {
 
     JSONArray arrayList = parser.getJSONArray("results");
 
-    String krCertification = null;
-    String usCertification = null;
+    String krCertification = "";
+    String usCertification = "";
 
     for (int i=0; i<arrayList.length(); i++) {
       JSONObject temp = (JSONObject) arrayList.get(i);
@@ -202,7 +207,7 @@ public class MovieUtil {
       else if (countryCode.equals("US")) usCertification = certification;
     }
 
-    if (!krCertification.equals(null)) return krCertification;
+    if (!krCertification.isEmpty()) return krCertification;
     else return usCertification;
   }
 
@@ -216,8 +221,8 @@ public class MovieUtil {
 
     JSONArray arrayList = parser.getJSONArray("results");
 
-    String krCertification = null;
-    String usCertification = null;
+    String krCertification = "";
+    String usCertification = "";
 
     for (int i = 0; i< arrayList.length(); i++) {
       JSONObject result = (JSONObject) arrayList.get(i);
@@ -230,5 +235,34 @@ public class MovieUtil {
 
     if (!krCertification.equals(null)) return krCertification;
     else return usCertification;
+  }
+
+  public RecommendEntity saveRecommend(String type, int contentId) {
+    String path = type + "/" + contentId;
+
+    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+
+    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+
+    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    Long id = parser.getLong("id");
+    String title;
+    if (type.equals("movie")) title = parser.getString("title");
+    else title = parser.getString("name");
+    String poster = parser.getString("poster_path");
+    String overview = parser.getString("overview");
+
+    JSONArray genreList = parser.getJSONArray("genres");
+    String returnGenre = "";
+    for (int i=0; i<genreList.length(); i++) {
+      JSONObject genreObject = (JSONObject) genreList.get(i);
+      String genre = genreObject.getString("name");
+      returnGenre = returnGenre + "," + genre;
+    }
+
+    RecommendEntity recommendEntity = new RecommendEntity(id, 0, type, title, returnGenre, poster, overview);
+
+    return recommendEntity;
   }
 }

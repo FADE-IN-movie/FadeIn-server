@@ -39,4 +39,10 @@ public class MainPageController {
     return mainPageService.getMainPage(popular, topRate, nowPlaying, preference, recommend);
   }
 
+//  @PostMapping(value = "/recommend")
+//  public void postRecommendContents() {
+//    mainPageService.saveRecommend();
+//    LOGGER.info("SAVE RECOMMEND CONTENTS.");
+//  }
+
 }

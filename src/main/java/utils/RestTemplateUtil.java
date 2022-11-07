@@ -30,7 +30,6 @@ public class RestTemplateUtil {
     ResponseEntity<String> requestEntity = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
 
     JSONObject parser = new JSONObject(requestEntity.getBody());
-
     return parser;
   }
 

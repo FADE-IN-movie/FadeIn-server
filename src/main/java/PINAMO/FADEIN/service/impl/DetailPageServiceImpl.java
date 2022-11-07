@@ -38,25 +38,58 @@ public class DetailPageServiceImpl implements DetailPageService {
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
     int contentId = parser.getInt("id");
-    String title = parser.getString("title");
-    String originalTitle = parser.getString("original_title");
-    String poster = "https://image.tmdb.org/t/p/original" + parser.getString("poster_path");
-    String backdrop = "https://image.tmdb.org/t/p/original" + parser.getString("backdrop_path");
-    String releaseDate = parser.getString("release_date");
-    JSONArray genreList = parser.getJSONArray("genres");
-    List<String> returnGenre = new ArrayList<>();
-    for (int i=0; i<genreList.length(); i++) {
-      JSONObject genreObject = (JSONObject) genreList.get(i);
-      String genre = genreObject.getString("name");
-      returnGenre.add(genre);
-    }
-    JSONObject countryObject = (JSONObject) parser.getJSONArray("production_countries").get(0);
-    String country = countryObject.getString("iso_3166_1"); // 국가코드를 나라이름으로 바꾸는 함수 필요
-    String runtime = Integer.toString(parser.getInt("runtime"));
+    String title;
+    String originalTitle;
+    String poster;
+    String backdrop;
+    String releaseDate;
+    String country;
+    String runtime;
     String certification;
 
-    if (path.split("/")[0].equals("movie")) certification =movieUtil.getMovieCertification(contentId);
-    else certification =movieUtil.getTvCertification(contentId);
+    Object poster_path = parser.get("poster_path");
+    if (poster_path == null) {
+      String reRequestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=en-US", path);
+
+      parser = restTemplateUtil.GetRestTemplate(reRequestURL);
+      poster = "https://image.tmdb.org/t/p/original" + parser.getString("poster_path");
+    }
+    else poster = "https://image.tmdb.org/t/p/original" + poster_path;
+
+    Object backdrop_path = parser.get("backdrop_path");
+    if (backdrop_path == null) {
+      backdrop = "";
+    }
+    else backdrop = "https://image.tmdb.org/t/p/original" + backdrop_path;
+
+    JSONArray genreList = parser.getJSONArray("genres");
+    List<String> returnGenre = new ArrayList<>();
+
+    if (genreList.length() != 0) {
+      for (int i = 0; i < genreList.length(); i++) {
+        JSONObject genreObject = (JSONObject) genreList.get(i);
+        String genre = genreObject.getString("name");
+        returnGenre.add(genre);
+      }
+    }
+
+    if (path.split("/")[0].equals("movie")) {
+      title = parser.getString("title");
+      originalTitle = parser.getString("original_title");
+      releaseDate = parser.getString("release_date");
+      JSONObject countryObject = (JSONObject) parser.getJSONArray("production_countries").get(0);
+      country = countryObject.getString("iso_3166_1"); // 국가코드를 나라이름으로 바꾸는 함수 필요
+      certification =movieUtil.getMovieCertification(contentId);
+      runtime = Integer.toString(parser.getInt("runtime"));
+    }
+    else {
+      title = parser.getString("name");
+      originalTitle = parser.getString("original_name");
+      releaseDate = parser.getString("first_air_date");
+      country = parser.getJSONArray("origin_country").get(0).toString();// 국가코드를 나라이름으로 바꾸는 함수 필요
+      certification =movieUtil.getTvCertification(contentId);
+      runtime = Objects.toString(parser.getJSONArray("episode_run_time").get(0));
+    }
 
     String overview = parser.getString("overview");
 
@@ -126,7 +159,10 @@ public class DetailPageServiceImpl implements DetailPageService {
 
       int id = movie.getInt("id");
       String type = path.split("/")[0];
-      String title = movie.getString("title");
+      String title;
+
+      if (type.equals("movie"))  title = movie.getString("title");
+      else title = movie.getString("name");
 
       JSONArray genre_ids = movie.getJSONArray("genre_ids");
 
