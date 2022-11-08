@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class mainPageDTO {
+public class MainPageDTO {
 
   private List<movieObject> popular;
   private List<movieObject> topRate;

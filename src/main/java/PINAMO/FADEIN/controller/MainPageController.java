@@ -1,11 +1,7 @@
 package PINAMO.FADEIN.controller;
 
-import PINAMO.FADEIN.data.dto.movie.detailPageDTO;
-import PINAMO.FADEIN.data.object.castObject;
-import PINAMO.FADEIN.data.object.detailObject;
 import PINAMO.FADEIN.data.object.movieObject;
-import PINAMO.FADEIN.data.dto.movie.mainPageDTO;
-import PINAMO.FADEIN.service.DetailPageService;
+import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
 import PINAMO.FADEIN.service.MainPageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +25,7 @@ public class MainPageController {
   }
 
   @GetMapping(value = "")
-  public mainPageDTO getMainPage(@RequestParam String type) {
+  public MainPageDTO getMainPage(@RequestParam String type) {
     List<movieObject> popular = mainPageService.getPopular(type);
     List<movieObject> topRate = mainPageService.getTopRate(type);
     List<movieObject> nowPlaying = mainPageService.getNowPlaying(type);

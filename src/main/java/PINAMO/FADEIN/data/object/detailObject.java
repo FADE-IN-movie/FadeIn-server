@@ -21,6 +21,7 @@ public class detailObject {
   private String country;
   private String runtime;
   private String certification;
+  private String rating;
   private String overview;
 
 }

@@ -12,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class detailPageDTO {
+public class DetailPageDTO {
 
   private detailObject data;
   private List<castObject> cast;
-  private List<movieObject> similarMovie;
+  private List<movieObject> similarContent;
 
 }

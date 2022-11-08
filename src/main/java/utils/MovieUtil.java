@@ -2,6 +2,7 @@ package utils;
 
 import PINAMO.FADEIN.data.Entity.RecommendEntity;
 import PINAMO.FADEIN.data.Entity.UserEntity;
+import PINAMO.FADEIN.data.object.castObject;
 import PINAMO.FADEIN.data.object.movieObject;
 import PINAMO.FADEIN.handler.RecommendDataHandler;
 import PINAMO.FADEIN.handler.UserDataHandler;
@@ -21,11 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieUtil {
-  public ArrayList<String> GenreTransducer(ArrayList<Integer> genres){
+  RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+
+  public ArrayList<String> GenreTransducer(JSONArray genres){
     ArrayList<String> returnArrayList = new ArrayList<>();
 
-    for (int i = 0; i < genres.size(); i++) {
-      switch (genres.get(i)) {
+    for (int i = 0; i < genres.length(); i++) {
+      switch ((int) genres.get(i)) {
         case 28:
           returnArrayList.add("액션");
           break;
@@ -112,12 +115,38 @@ public class MovieUtil {
     return returnArrayList;
   }
 
+  public ArrayList<String> GenreTransducerByName(JSONArray genreList) {
+    ArrayList<String> returnGenre = new ArrayList<>();
+
+    if (genreList.length() != 0) {
+      for (int i = 0; i < genreList.length(); i++) {
+        JSONObject genreObject = (JSONObject) genreList.get(i);
+        String genre = genreObject.getString("name");
+        returnGenre.add(genre);
+      }
+    }
+
+    return returnGenre;
+  }
+
+  public String profileImageTransducer(Object profilePath, int gender) {
+    String profile;
+    if (!profilePath.equals(null)) {
+      profile = "https://image.tmdb.org/t/p/w185" + profilePath;
+    }
+    else {
+      if (gender == 1)
+        profile = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe957375e70239d6abdd549fd7568c89281b2179b5f4470e2e12895792dfa5.svg";
+      else
+        profile = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-36-user-female-grey-d9222f16ec16a33ed5e2c9bbdca07a4c48db14008bbebbabced8f8ed1fa2ad59.svg";
+    }
+    return profile;
+  }
+
   public String overviewTransducer(String type, int movieId) {
     String path = type+"/"+movieId;
 
     String url = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=en-US", path);
-
-    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
 
     JSONObject parser = restTemplateUtil.GetRestTemplate(url);
 
@@ -126,12 +155,37 @@ public class MovieUtil {
     return overview;
   }
 
-  public List<movieObject> getMovies(String type, String menu) {
-    String path = type + "/" + menu;
+  public String posterTransducer(Object poster_path) {
+    String poster;
 
-    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko&page=1", path);
+    if (poster_path.equals(null)) poster = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg";
+    else poster = "https://image.tmdb.org/t/p/original" + poster_path;
 
-    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+    return poster;
+  }
+
+  public String countryTransducer(JSONArray countryArray, String type) {
+    String country;
+
+    if (countryArray.length() != 0) {
+      if (type.equals("movie")) {
+        JSONObject countryObject = (JSONObject) countryArray.get(0);
+        country = countryObject.getString("iso_3166_1"); // 국가코드를 나라이름으로 바꾸는 함수 필요
+      }
+      else country = countryArray.get(0).toString();// 국가코드를 나라이름으로 바꾸는 함수 필요
+    }
+    else country = null;
+
+    return country;
+  }
+
+  public List<movieObject> getMovies(String type, String menu, String query) {
+    String path;
+
+    if (menu.equals("search")) path = menu + "/" + type;
+    else path= type + "/" + menu;
+
+    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko%s&page=1", path, query);
 
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
@@ -139,54 +193,42 @@ public class MovieUtil {
 
     List<movieObject> return_movies = new ArrayList<>();
 
-    for (int i = 0; i < 10; i++) {
-      JSONObject detail = (JSONObject) arrayList.get(i);
+    if (arrayList.length() != 0) {
+      for (int i = 0; i < 10; i++) {
+        JSONObject detail = (JSONObject) arrayList.get(i);
 
-      MovieUtil movieUtil = new MovieUtil();
+        MovieUtil movieUtil = new MovieUtil();
 
-      int movieId = detail.getInt("id");
+        int movieId = detail.getInt("id");
 
-      String title;
+        String title;
 
-      if (type.equals("movie")) title = detail.getString("title");
-      else title = detail.getString("name");
+        if (type.equals("movie")) title = detail.getString("title");
+        else title = detail.getString("name");
 
-      String overview = detail.getString("overview");
+        String overview = detail.getString("overview");
 
-      if (overview.equals("")) {
+        if (overview.equals("")) overview = movieUtil.overviewTransducer(type, movieId);
 
-        overview = movieUtil.overviewTransducer(type, movieId);
+        ArrayList<String> return_genres = movieUtil.GenreTransducer(detail.getJSONArray("genre_ids"));
+
+        String poster = posterTransducer(detail.get("poster_path"));
+
+        movieObject movie;
+
+        if (menu.equals("popular") || menu.equals("top_rated")) {
+          movie = new movieObject(movieId, i + 1, type, title, return_genres, poster, overview);
+        } else movie = new movieObject(movieId, type, title, return_genres, poster, overview);
+
+        return_movies.add(movie);
       }
-      JSONArray genre_ids = detail.getJSONArray("genre_ids");
-
-      ArrayList<Integer> genres = new ArrayList<>();
-
-      for (int j = 0; j<genre_ids.length(); j++) {
-        genres.add((int) genre_ids.get(j));
-      }
-
-      ArrayList<String> return_genres = movieUtil.GenreTransducer(genres);
-
-      String poster = "https://image.tmdb.org/t/p/w500" + detail.getString("poster_path");
-
-      movieObject movie;
-
-      if (menu.equals("popular") || menu.equals("top_rated")) {
-        movie = new movieObject(movieId, i+1, type, title, return_genres, poster, overview);
-      }
-      else movie = new movieObject(movieId, type, title, return_genres, poster, overview);
-
-      return_movies.add(movie);
     }
-
     return return_movies;
   }
 
   public String getMovieCertification(int movieId) {
 
     String requestURL = String.format("https://api.themoviedb.org/3/movie/%s/release_dates?api_key=929a001736172a3578c0d6bf3b3cbbc5", movieId);
-
-    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
 
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
@@ -195,18 +237,19 @@ public class MovieUtil {
     String krCertification = "";
     String usCertification = "";
 
-    for (int i=0; i<arrayList.length(); i++) {
-      JSONObject temp = (JSONObject) arrayList.get(i);
+    if (arrayList.length() != 0) {
+      for (int i = 0; i < arrayList.length(); i++) {
+        JSONObject temp = (JSONObject) arrayList.get(i);
 
-      String countryCode = temp.getString("iso_3166_1");
-      JSONArray certificationList = temp.getJSONArray("release_dates");
-      JSONObject certificationObject = (JSONObject) certificationList.get(0);
-      String certification = certificationObject.getString("certification");
-      
-      if ((countryCode.equals("KR") && !certification.equals(""))) krCertification = certification;
-      else if (countryCode.equals("US")) usCertification = certification;
+        String countryCode = temp.getString("iso_3166_1");
+        JSONArray certificationList = temp.getJSONArray("release_dates");
+        JSONObject certificationObject = (JSONObject) certificationList.get(0);
+        String certification = certificationObject.getString("certification");
+
+        if ((countryCode.equals("KR") && !certification.equals(""))) krCertification = certification;
+        else if (countryCode.equals("US")) usCertification = certification;
+      }
     }
-
     if (!krCertification.isEmpty()) return krCertification;
     else return usCertification;
   }
@@ -215,8 +258,6 @@ public class MovieUtil {
 
     String requestURL = String.format("https://api.themoviedb.org/3/tv/%s/content_ratings?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", tvId);
 
-    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
-
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
     JSONArray arrayList = parser.getJSONArray("results");
@@ -224,13 +265,15 @@ public class MovieUtil {
     String krCertification = "";
     String usCertification = "";
 
-    for (int i = 0; i< arrayList.length(); i++) {
-      JSONObject result = (JSONObject) arrayList.get(i);
+    if (arrayList.length() != 0) {
+      for (int i = 0; i < arrayList.length(); i++) {
+        JSONObject result = (JSONObject) arrayList.get(i);
 
-      String countryCode = result.getString("iso_3166_1");
+        String countryCode = result.getString("iso_3166_1");
 
-      if (countryCode.equals("KR")) krCertification = result.getString("rating");
-      else if (countryCode.equals("US")) usCertification = result.getString("rating");
+        if (countryCode.equals("KR")) krCertification = result.getString("rating");
+        else if (countryCode.equals("US")) usCertification = result.getString("rating");
+      }
     }
 
     if (!krCertification.equals(null)) return krCertification;
@@ -241,8 +284,6 @@ public class MovieUtil {
     String path = type + "/" + contentId;
 
     String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-
-    RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
 
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
@@ -255,10 +296,13 @@ public class MovieUtil {
 
     JSONArray genreList = parser.getJSONArray("genres");
     String returnGenre = "";
-    for (int i=0; i<genreList.length(); i++) {
-      JSONObject genreObject = (JSONObject) genreList.get(i);
-      String genre = genreObject.getString("name");
-      returnGenre = returnGenre + "," + genre;
+
+    if (genreList.length() != 0) {
+      for (int i = 0; i < genreList.length(); i++) {
+        JSONObject genreObject = (JSONObject) genreList.get(i);
+        String genre = genreObject.getString("name");
+        returnGenre = returnGenre + "," + genre;
+      }
     }
 
     RecommendEntity recommendEntity = new RecommendEntity(id, 0, type, title, returnGenre, poster, overview);
