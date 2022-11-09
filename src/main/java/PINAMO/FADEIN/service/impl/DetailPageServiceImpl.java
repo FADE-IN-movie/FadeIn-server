@@ -148,7 +148,7 @@ public class DetailPageServiceImpl implements DetailPageService {
 
         ArrayList<String> return_genres = movieUtil.GenreTransducer(movie.getJSONArray("genre_ids"));
 
-        String poster = movieUtil.posterTransducer(movie.getString("poster_path"));
+        String poster = movieUtil.posterTransducer(movie.get("poster_path"));
 
         String overview = movie.getString("overview");
 

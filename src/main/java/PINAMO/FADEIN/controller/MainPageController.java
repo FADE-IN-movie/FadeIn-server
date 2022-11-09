@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -30,9 +31,14 @@ public class MainPageController {
     List<movieObject> topRate = mainPageService.getTopRate(type);
     List<movieObject> nowPlaying = mainPageService.getNowPlaying(type);
     List<movieObject> preference = mainPageService.getPopular(type);
-    List<movieObject> recommend = mainPageService.getPopular(type);
+    List<movieObject> recommend = mainPageService.getRecommend(type);
     LOGGER.info("GET "+ type.toUpperCase() + " CONTENTS.");
     return mainPageService.getMainPage(popular, topRate, nowPlaying, preference, recommend);
+  }
+
+  @PostMapping(value = "/like", headers = "HEADER")
+  public void toggleLike(@RequestBody int contentId, @RequestHeader Map<String, String> header) {
+    header.get("");
   }
 
 //  @PostMapping(value = "/recommend")

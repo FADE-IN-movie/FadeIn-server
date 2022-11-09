@@ -13,8 +13,6 @@ public interface MainPageService {
   List<movieObject> getPreference(String type);
   List<movieObject> getRecommend(String type);
 
-//  void saveRecommend();
-
   MainPageDTO getMainPage(List<movieObject> popular, List<movieObject> topRated, List<movieObject> nowPlaying, List<movieObject> preference, List<movieObject> recommend);
 
 }

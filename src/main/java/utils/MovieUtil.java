@@ -6,6 +6,7 @@ import PINAMO.FADEIN.data.object.castObject;
 import PINAMO.FADEIN.data.object.movieObject;
 import PINAMO.FADEIN.handler.RecommendDataHandler;
 import PINAMO.FADEIN.handler.UserDataHandler;
+import io.swagger.models.auth.In;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MovieUtil {
+
   RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
 
   public ArrayList<String> GenreTransducer(JSONArray genres){
@@ -280,33 +281,54 @@ public class MovieUtil {
     else return usCertification;
   }
 
-  public RecommendEntity saveRecommend(String type, int contentId) {
-    String path = type + "/" + contentId;
+  public List<movieObject> getRecommendContent(String type){
 
-    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+    int[] movie = {20342, 372058, 101299, 70160, 207703, 343668,5876, 122906, 198663, 294254, 807, 2832, 550 ,244786 ,155 ,603 ,157336 ,6977 ,165213 ,278, 49797, 423, 398978, 530385};
+    int[] tv = {82237 ,67915 ,64840 ,117378 ,84327 ,70123 ,78648 ,80585 ,42009 ,86831 ,94796 ,97970 ,155226 ,20588 ,31505 ,90447 ,48462 ,112833 ,37722 ,1396 ,87739, 61459};
 
-    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+    Random random = new Random();
 
-    Long id = parser.getLong("id");
-    String title;
-    if (type.equals("movie")) title = parser.getString("title");
-    else title = parser.getString("name");
-    String poster = parser.getString("poster_path");
-    String overview = parser.getString("overview");
+    Set<Integer> randomContentSet = new HashSet<>();
 
-    JSONArray genreList = parser.getJSONArray("genres");
-    String returnGenre = "";
-
-    if (genreList.length() != 0) {
-      for (int i = 0; i < genreList.length(); i++) {
-        JSONObject genreObject = (JSONObject) genreList.get(i);
-        String genre = genreObject.getString("name");
-        returnGenre = returnGenre + "," + genre;
+    if (type.equals("movie")) {
+      while (randomContentSet.size() < 10) {
+        randomContentSet.add(movie[random.nextInt(movie.length)]);
+      }
+    }
+    else {
+      while (randomContentSet.size() < 10) {
+        randomContentSet.add(tv[random.nextInt(tv.length)]);
       }
     }
 
-    RecommendEntity recommendEntity = new RecommendEntity(id, 0, type, title, returnGenre, poster, overview);
+    ArrayList<Integer> randomContent = new ArrayList<>(randomContentSet);
 
-    return recommendEntity;
+    List<movieObject> returnContents = new ArrayList<>();
+
+    for (int i=0; i<randomContent.size(); i++) {
+
+      String path = type + "/" + randomContent.get(i);
+
+      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+      int id = parser.getInt("id");
+
+      String title;
+      ArrayList<String> genre = GenreTransducerByName(parser.getJSONArray("genres"));
+      String poster = posterTransducer(parser.get("poster_path"));
+      String overview = parser.getString("overview");
+
+      if (type.equals("movie")) {
+        title = parser.getString("title");
+      }
+      else {
+        title = parser.getString("name");
+      }
+      movieObject movieObject = new movieObject(id,type,title,genre,poster,overview);
+
+      returnContents.add(movieObject);
+    }
+    return returnContents;
   }
 }
