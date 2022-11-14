@@ -182,6 +182,7 @@ public class MovieUtil {
 
   public List<movieObject> getMovies(String type, String menu, String query) {
     String path;
+    int size = 10;
 
     if (menu.equals("search")) path = menu + "/" + type;
     else path= type + "/" + menu;
@@ -195,7 +196,9 @@ public class MovieUtil {
     List<movieObject> return_movies = new ArrayList<>();
 
     if (arrayList.length() != 0) {
-      for (int i = 0; i < 10; i++) {
+      if (menu.equals("search")) size = arrayList.length();
+
+      for (int i = 0; i < size; i++) {
         JSONObject detail = (JSONObject) arrayList.get(i);
 
         MovieUtil movieUtil = new MovieUtil();

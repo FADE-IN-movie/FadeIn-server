@@ -24,140 +24,154 @@ public class DetailPageServiceImpl implements DetailPageService {
   @Override
   public detailObject getDetail(String path) {
 
-    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+    try {
+      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
-    int contentId = parser.getInt("id");
-    String title;
-    String originalTitle;
-    String poster = movieUtil.posterTransducer(parser.get("poster_path"));
-    String backdrop = movieUtil.posterTransducer(parser.get("backdrop_path"));
-    String releaseDate;
-    String country;
-    String runtime;
-    String certification;
+      int contentId = parser.getInt("id");
+      String title;
+      String originalTitle;
+      String poster = movieUtil.posterTransducer(parser.get("poster_path"));
+      String backdrop = movieUtil.posterTransducer(parser.get("backdrop_path"));
+      String releaseDate;
+      String country;
+      String runtime;
+      String certification;
 
-    ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
+      ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
 
-    String type = path.split("/")[0];
-    if (type.equals("movie")) {
-      title = parser.getString("title");
-      originalTitle = parser.getString("original_title");
-      releaseDate = parser.getString("release_date");
+      String type = path.split("/")[0];
+      if (type.equals("movie")) {
+        title = parser.getString("title");
+        originalTitle = parser.getString("original_title");
+        releaseDate = parser.getString("release_date");
 
-      country = movieUtil.countryTransducer(parser.getJSONArray("production_countries"), type);
-      certification = movieUtil.getMovieCertification(contentId);
+        country = movieUtil.countryTransducer(parser.getJSONArray("production_countries"), type);
+        certification = movieUtil.getMovieCertification(contentId);
 
-      runtime = Integer.toString(parser.getInt("runtime"));
+        runtime = Integer.toString(parser.getInt("runtime"));
+      }
+      else {
+        title = parser.getString("name");
+        originalTitle = parser.getString("original_name");
+        releaseDate = parser.getString("first_air_date");
+
+        country = movieUtil.countryTransducer(parser.getJSONArray("origin_country"), type);
+        certification = movieUtil.getTvCertification(contentId);
+
+        JSONArray runtimeArray = parser.getJSONArray("episode_run_time");
+        if (runtimeArray.length() != 0) runtime = Objects.toString(runtimeArray.get(0));
+        else runtime = null;
+      }
+
+      String rating = parser.get("vote_average").toString();
+      String overview = parser.getString("overview");
+
+      return new detailObject(contentId, title, originalTitle, poster, backdrop, releaseDate, genre, country, runtime, certification, rating, overview);
     }
-    else {
-      title = parser.getString("name");
-      originalTitle = parser.getString("original_name");
-      releaseDate = parser.getString("first_air_date");
-
-      country = movieUtil.countryTransducer(parser.getJSONArray("origin_country"), type);
-      certification = movieUtil.getTvCertification(contentId);
-
-      JSONArray runtimeArray = parser.getJSONArray("episode_run_time");
-      if (runtimeArray.length() != 0) runtime = Objects.toString(runtimeArray.get(0));
-      else runtime = null;
+    catch (Exception e) {
+      return null;
     }
-
-    String rating = parser.get("vote_average").toString();
-    String overview = parser.getString("overview");
-
-    return new detailObject(contentId, title, originalTitle, poster, backdrop, releaseDate, genre, country, runtime, certification, rating, overview);
   }
 
   @Override
   public List<castObject> getCast(String path) {
+    try {
+      path = path + "/" + "credits";
 
-    path = path + "/" + "credits";
+      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
-    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+      JSONArray crews = parser.getJSONArray("crew");
 
-    JSONArray crews = parser.getJSONArray("crew");
+      List<castObject> returnCast = new ArrayList<>();
 
-    List<castObject> returnCast = new ArrayList<>();
+      if (crews.length() != 0) {
+        for (int i = 0; i < crews.length(); i++) {
+          JSONObject crew = (JSONObject) crews.get(i);
 
-    if (crews.length() != 0) {
-      for (int i = 0; i < crews.length(); i++) {
-        JSONObject crew = (JSONObject) crews.get(i);
+          String job = crew.getString("job");
 
-        String job = crew.getString("job");
+          if (job.equals("Director")) {
+            String name = crew.getString("name");
 
-        if (job.equals("Director")) {
-          String name = crew.getString("name");
+            String profile = movieUtil.profileImageTransducer(crew.get("profile_path"), crew.getInt("gender"));
 
-          String profile = movieUtil.profileImageTransducer(crew.get("profile_path"), crew.getInt("gender"));
+            castObject castObject = new castObject(name, job, profile);
 
-          castObject castObject = new castObject(name, job, profile);
+            returnCast.add(castObject);
 
-          returnCast.add(castObject);
-
-          break;
+            break;
+          }
         }
       }
-    }
 
-    JSONArray casts = parser.getJSONArray("cast");
-    int castLength = casts.length();
+      JSONArray casts = parser.getJSONArray("cast");
+      int castLength = casts.length();
 
-    if (castLength != 0) {
-      if (castLength > 5) castLength = 5;
+      if (castLength != 0) {
+        if (castLength > 5) castLength = 5;
 
-      for (int i = 0; i < castLength; i++) {
-        JSONObject cast = (JSONObject) casts.get(i);
+        for (int i = 0; i < castLength; i++) {
+          JSONObject cast = (JSONObject) casts.get(i);
 
-        String name = cast.getString("name");
-        String role = cast.getString("character");
+          String name = cast.getString("name");
+          String role = cast.getString("character");
 
-        String profile = movieUtil.profileImageTransducer(cast.get("profile_path"), cast.getInt("gender"));
+          String profile = movieUtil.profileImageTransducer(cast.get("profile_path"), cast.getInt("gender"));
 
-        castObject castObject = new castObject(name, role, profile);
+          castObject castObject = new castObject(name, role, profile);
 
-        returnCast.add(castObject);
+          returnCast.add(castObject);
+        }
       }
-    }
 
-    return returnCast;
+      return returnCast;
+    }
+    catch (Exception e) {
+      return null;
+    }
   }
 
   @Override
   public List<movieObject> getSimilarContents(String path) {
-    path = path + "/" + "recommendations";
+    try {
+      path = path + "/" + "recommendations";
 
-    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko&page=1", path);
-    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko&page=1", path);
+      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
-    JSONArray similarMovies = parser.getJSONArray("results");
+      JSONArray similarMovies = parser.getJSONArray("results");
 
-    List<movieObject> returnSimilarMovies = new ArrayList<>();
+      List<movieObject> returnSimilarMovies = new ArrayList<>();
 
-    if (similarMovies.length() != 0) {
-      for (int i = 0; i < 5; i++) {
-        JSONObject movie = (JSONObject) similarMovies.get(i);
+      if (similarMovies.length() != 0) {
+        for (int i = 0; i < 5; i++) {
+          JSONObject movie = (JSONObject) similarMovies.get(i);
 
-        int id = movie.getInt("id");
-        String type = path.split("/")[0];
-        String title;
+          int id = movie.getInt("id");
+          String type = path.split("/")[0];
+          String title;
 
-        if (type.equals("movie")) title = movie.getString("title");
-        else title = movie.getString("name");
+          if (type.equals("movie")) title = movie.getString("title");
+          else title = movie.getString("name");
 
-        ArrayList<String> return_genres = movieUtil.GenreTransducer(movie.getJSONArray("genre_ids"));
+          ArrayList<String> return_genres = movieUtil.GenreTransducer(movie.getJSONArray("genre_ids"));
 
-        String poster = movieUtil.posterTransducer(movie.get("poster_path"));
+          String poster = movieUtil.posterTransducer(movie.get("poster_path"));
 
-        String overview = movie.getString("overview");
+          String overview = movie.getString("overview");
 
-        movieObject movieObject = new movieObject(id, type, title, return_genres, poster, overview);
+          movieObject movieObject = new movieObject(id, type, title, return_genres, poster, overview);
 
-        returnSimilarMovies.add(movieObject);
+          returnSimilarMovies.add(movieObject);
+        }
       }
+      return returnSimilarMovies;
     }
-    return returnSimilarMovies;
+    catch (Exception e) {
+      return null;
+    }
   }
 
   @Override

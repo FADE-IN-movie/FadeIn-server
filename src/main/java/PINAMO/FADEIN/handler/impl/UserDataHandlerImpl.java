@@ -29,6 +29,8 @@ public class UserDataHandlerImpl implements UserDataHandler {
 
   @Override
   public UserEntity getUserEntity(Long userId) {
+
+
     return userDAO.getUser(userId);
   }
 

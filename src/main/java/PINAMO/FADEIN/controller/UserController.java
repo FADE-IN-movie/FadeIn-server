@@ -5,7 +5,7 @@ import PINAMO.FADEIN.data.dto.user.accessTokenDTO;
 import PINAMO.FADEIN.data.dto.user.userDTO;
 import PINAMO.FADEIN.service.UserService;
 import exception.Constants;
-import exception.UserException;
+import exception.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class UserController {
 
   private UserService userService;
@@ -32,41 +32,63 @@ public class UserController {
   }
 
   @GetMapping(value = "/{userId}")
-  public userDTO getUser(@PathVariable Long userId) {
+  public userDTO getUser(@PathVariable Long userId) throws CustomException {
+
     LOGGER.info("GET USER INFORMATION.");
-    return userService.getUser(userId);
+    userDTO result = userService.getUser(userId);
+
+    if (result == null) {
+      LOGGER.error("NOT EXIST USER.");
+      throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.NOT_FOUND, "NOT EXIST USER.");
+    }
+    else return result;
   }
 
   @PostMapping(value = "/google")
-  public loginDTO loginGoogleUser(@RequestBody String accessToken) {
+  public loginDTO loginGoogleUser(@RequestBody String accessToken) throws CustomException {
+
     LOGGER.info("LOGIN GOOGLE USER.");
-    return userService.loginGoogleUser(accessToken);
+    loginDTO result = userService.loginGoogleUser(accessToken);
+
+    if (result == null) {
+      LOGGER.error("INTERNAL SERVER ERROR.");
+      throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR.");
+    }
+    else return result;
   }
 
   @PostMapping(value = "/naver")
-  public loginDTO loginNaverUser(@RequestBody String accessToken) {
+  public loginDTO loginNaverUser(@RequestBody String accessToken) throws CustomException {
+
     LOGGER.info("LOGIN NAVER USER.");
-    return userService.loginNaverUser(accessToken);
+    loginDTO result = userService.loginNaverUser(accessToken);
+
+    if (result == null) {
+      LOGGER.error("INTERNAL SERVER ERROR.");
+      throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    }
+    else return result;
   }
 
   @PostMapping(value = "/refresh")
-  public accessTokenDTO reissueAccessToken(@RequestBody String refreshToken) throws UserException {
-    accessTokenDTO returnDTO = userService.reissueAccessToken(refreshToken);
+  public accessTokenDTO reissueAccessToken(@RequestBody String refreshToken) throws CustomException {
 
     LOGGER.info("REFRESH ACCESS TOKEN.");
+    accessTokenDTO result = userService.reissueAccessToken(refreshToken);
 
-    if (returnDTO==null) {
-      throw new UserException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED REFRESH TOKEN.");
+    if (result == null) {
+      LOGGER.error("UNAUTHORIZED REFRESH TOKEN.");
+      throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED REFRESH TOKEN");
     }
-    else return returnDTO;
+    else return result;
   }
 
-  @ExceptionHandler(value = UserException.class)
-  public ResponseEntity<Map<String, String>> ExceptionHandler(UserException e) {
+  @ExceptionHandler(value = CustomException.class)
+  public ResponseEntity<Map<String, String>> ExceptionHandler(CustomException e) {
     HttpHeaders responseHeaders = new HttpHeaders();
 
     Map<String, String> map = new HashMap<>();
-    map.put("error type", e.getHttpStatusType());
+    map.put("type", e.getHttpStatusType());
     map.put("code", Integer.toString(e.getHttpStatusCode()));
     map.put("message", e.getMessage());
 

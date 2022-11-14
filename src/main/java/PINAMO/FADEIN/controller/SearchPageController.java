@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/search")
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class SearchPageController {
 
   private SearchPageService searchPageService;

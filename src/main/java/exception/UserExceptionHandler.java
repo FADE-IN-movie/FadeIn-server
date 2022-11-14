@@ -15,8 +15,8 @@ public class UserExceptionHandler{
 
   private final Logger LOGGER = LoggerFactory.getLogger(UserExceptionHandler.class);
 
-  @ExceptionHandler(value = UserException.class)
-  public ResponseEntity<Map<String, String>> ExceptionHandler(UserException e) {
+  @ExceptionHandler(value = CustomException.class)
+  public ResponseEntity<Map<String, String>> ExceptionHandler(CustomException e) {
     HttpHeaders responseHeaders = new HttpHeaders();
 
     Map<String, String> map = new HashMap<>();
