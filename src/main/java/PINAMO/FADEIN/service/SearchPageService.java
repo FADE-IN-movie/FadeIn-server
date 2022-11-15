@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface SearchPageService {
 
-  SearchPageDTO getSearchPage(String type, String keyword);
+  SearchPageDTO getSearchPage(String type, String keyword, int page);
   SearchLengthDTO getSearchLength(String keyword);
 
 }

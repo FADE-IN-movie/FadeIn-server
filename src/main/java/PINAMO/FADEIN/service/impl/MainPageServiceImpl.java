@@ -1,6 +1,5 @@
 package PINAMO.FADEIN.service.impl;
 
-import PINAMO.FADEIN.data.Entity.RecommendEntity;
 import PINAMO.FADEIN.data.object.movieObject;
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
 import PINAMO.FADEIN.handler.RecommendDataHandler;
@@ -10,9 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import utils.MovieUtil;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
 
 @Service
 public class MainPageServiceImpl implements MainPageService {
@@ -29,7 +27,7 @@ public class MainPageServiceImpl implements MainPageService {
   @Override
   public List<movieObject> getPopular(String type) {
     try {
-      List<movieObject> result = movieUtil.getMovies(type, "popular", "");
+      List<movieObject> result = movieUtil.getMovies(type, "popular", 1,"");
       return result;
     }
     catch (Exception e) {
@@ -40,7 +38,7 @@ public class MainPageServiceImpl implements MainPageService {
   @Override
   public List<movieObject> getTopRate(String type) {
     try {
-      List<movieObject> result = movieUtil.getMovies(type, "top_rated", "");
+      List<movieObject> result = movieUtil.getMovies(type, "top_rated", 1,"");
       return result;
     }
     catch (Exception e) {
@@ -53,11 +51,11 @@ public class MainPageServiceImpl implements MainPageService {
     try {
       List<movieObject> result;
       if (type.equals("movie")) {
-        result = movieUtil.getMovies(type, "now_playing", "");
+        result = movieUtil.getMovies(type, "now_playing", 1, "");
         return result;
       }
       else {
-        result = movieUtil.getMovies(type, "on_the_air", "");
+        result = movieUtil.getMovies(type, "on_the_air", 1,"");
         return result;
       }
     }

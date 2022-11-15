@@ -28,11 +28,11 @@ public class SearchPageController {
   }
 
   @GetMapping(value = "")
-  public SearchPageDTO getSearchPage(@RequestParam String type, @RequestParam String keyword) {
+  public SearchPageDTO getSearchPage(@RequestParam String type, @RequestParam String keyword, @RequestParam int page) {
 
     LOGGER.info("GET SEARCH RESULTS.");
 
-    return searchPageService.getSearchPage(type, keyword);
+    return searchPageService.getSearchPage(type, keyword, page);
   }
 
   @GetMapping(value = "/length")
