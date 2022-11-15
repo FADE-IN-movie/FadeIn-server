@@ -1,6 +1,7 @@
 package PINAMO.FADEIN.service.impl;
 
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
+import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
 import PINAMO.FADEIN.data.dto.movie.SearchPageDTO;
 import PINAMO.FADEIN.data.object.movieObject;
 import PINAMO.FADEIN.handler.RecommendDataHandler;
@@ -29,5 +30,13 @@ public class SearchPageServiceImpl implements SearchPageService {
     SearchPageDTO searchPageDTO = new SearchPageDTO(movieUtil.getMovies(type, "search", query));
 
     return searchPageDTO;
+  }
+
+  @Override
+  public SearchLengthDTO getSearchLength(String keyword) {
+
+    SearchLengthDTO searchLengthDTO = movieUtil.getSearchLength(keyword);
+
+    return searchLengthDTO;
   }
 }

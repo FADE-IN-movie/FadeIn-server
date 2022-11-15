@@ -2,6 +2,7 @@ package utils;
 
 import PINAMO.FADEIN.data.Entity.RecommendEntity;
 import PINAMO.FADEIN.data.Entity.UserEntity;
+import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
 import PINAMO.FADEIN.data.object.castObject;
 import PINAMO.FADEIN.data.object.movieObject;
 import PINAMO.FADEIN.handler.RecommendDataHandler;
@@ -333,5 +334,34 @@ public class MovieUtil {
       returnContents.add(movieObject);
     }
     return returnContents;
+  }
+
+  public SearchLengthDTO getSearchLength(String keyword) {
+
+    String query = "&query=" + keyword;
+
+    String requestURL = String.format("https://api.themoviedb.org/3/search/movie?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko%s&page=1", query);
+    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    Object Object = parser.get("total_results");
+    int movieLength = 0;
+
+    if (Object != null) {
+      movieLength = (int) Object;
+    }
+
+    requestURL = String.format("https://api.themoviedb.org/3/search/tv?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko%s&page=1", query);
+    parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    Object = parser.get("total_results");
+    int tvLength = 0;
+
+    if (Object != null) {
+      tvLength = (int) Object;
+    }
+
+    SearchLengthDTO searchLengthDTO = new SearchLengthDTO(movieLength, tvLength);
+
+    return searchLengthDTO;
   }
 }
