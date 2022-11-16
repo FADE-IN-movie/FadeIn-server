@@ -69,17 +69,6 @@ public class MainPageController {
     return mainPageService.getMainPage(popular, topRate, nowPlaying, preference, recommend);
   }
 
-  @PostMapping(value = "/like", headers = "HEADER")
-  public void toggleLike(@RequestBody int contentId, @RequestHeader Map<String, String> header) {
-    header.get("");
-  }
-
-//  @PostMapping(value = "/recommend")
-//  public void postRecommendContents() {
-//    mainPageService.saveRecommend();
-//    LOGGER.info("SAVE RECOMMEND CONTENTS.");
-//  }
-
   @ExceptionHandler(value = CustomException.class)
   public ResponseEntity<Map<String, String>> ExceptionHandler(CustomException e) {
     HttpHeaders responseHeaders = new HttpHeaders();

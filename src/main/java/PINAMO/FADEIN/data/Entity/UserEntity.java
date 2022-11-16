@@ -10,16 +10,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "user")
+@Table(name = "users")
 public class UserEntity {
 
   @Id
   @GeneratedValue
   private Long id;
   @Column(unique = true)
-  String userEmail;
-  String userName;
-  String userImg;
+  private String userEmail;
+  private String userName;
+  private String userImg;
 
   public UserEntity(String userEmail, String userName, String userImg) {
     this.userEmail = userEmail;

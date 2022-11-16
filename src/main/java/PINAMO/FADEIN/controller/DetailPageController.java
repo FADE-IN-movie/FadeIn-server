@@ -1,5 +1,6 @@
 package PINAMO.FADEIN.controller;
 
+import PINAMO.FADEIN.data.dto.movie.LikeDTO;
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
 import PINAMO.FADEIN.data.object.castObject;
 import PINAMO.FADEIN.data.object.detailObject;
@@ -60,6 +61,27 @@ public class DetailPageController {
 
     return detailPageService.getDetailPage(detail, cast, similarContents);
   }
+
+  @PostMapping(value = "/like")
+  public LikeDTO changeLikeStatus(@RequestBody LikeDTO changeLikeDTO, @RequestHeader Map<String, String> header) {
+
+    LOGGER.info("CHANGE LIKE STATUS.");
+
+    boolean currentStatus = changeLikeDTO.isCurrentStatus();
+
+    if (currentStatus) {
+
+    }
+    header.get("userId");
+
+    return detailPageService.changeLikeStatue(changeLikeDTO, (long) 1);
+  }
+
+//  @PostMapping(value = "/recommend")
+//  public void postRecommendContents() {
+//    mainPageService.saveRecommend();
+//    LOGGER.info("SAVE RECOMMEND CONTENTS.");
+//  }
 
   @ExceptionHandler(value = CustomException.class)
   public ResponseEntity<Map<String, String>> ExceptionHandler(CustomException e) {

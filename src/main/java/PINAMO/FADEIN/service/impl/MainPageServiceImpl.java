@@ -2,9 +2,8 @@ package PINAMO.FADEIN.service.impl;
 
 import PINAMO.FADEIN.data.object.movieObject;
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
-import PINAMO.FADEIN.handler.RecommendDataHandler;
+import PINAMO.FADEIN.handler.ContentDataHandler;
 import PINAMO.FADEIN.service.MainPageService;
-import exception.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import utils.MovieUtil;
@@ -17,11 +16,11 @@ public class MainPageServiceImpl implements MainPageService {
 
   MovieUtil movieUtil = new MovieUtil();
 
-  RecommendDataHandler recommendDataHandler;
+  ContentDataHandler contentDataHandler;
 
   @Autowired
-  public MainPageServiceImpl(RecommendDataHandler recommendDataHandler) {
-    this.recommendDataHandler = recommendDataHandler;
+  public MainPageServiceImpl(ContentDataHandler contentDataHandler) {
+    this.contentDataHandler = contentDataHandler;
   }
 
   @Override

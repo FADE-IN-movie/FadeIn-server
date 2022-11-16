@@ -1,25 +1,10 @@
 package utils;
 
-import PINAMO.FADEIN.data.Entity.RecommendEntity;
-import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
-import PINAMO.FADEIN.data.object.castObject;
 import PINAMO.FADEIN.data.object.movieObject;
-import PINAMO.FADEIN.handler.RecommendDataHandler;
-import PINAMO.FADEIN.handler.UserDataHandler;
-import io.swagger.models.auth.In;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.*;
 
 public class MovieUtil {

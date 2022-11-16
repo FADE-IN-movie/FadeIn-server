@@ -1,25 +1,42 @@
 package PINAMO.FADEIN.service.impl;
 
+import PINAMO.FADEIN.data.Entity.ContentEntity;
+import PINAMO.FADEIN.data.Entity.LikeEntity;
+import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
+import PINAMO.FADEIN.data.dto.movie.LikeDTO;
 import PINAMO.FADEIN.data.object.castObject;
 import PINAMO.FADEIN.data.object.detailObject;
 import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.handler.ContentDataHandler;
+import PINAMO.FADEIN.handler.LikeDataHandler;
+import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.DetailPageService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import utils.MovieUtil;
 import utils.RestTemplateUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class DetailPageServiceImpl implements DetailPageService {
 
+  LikeDataHandler likeDataHandler;
+  UserDataHandler userDataHandler;
+  ContentDataHandler contentDataHandler;
+
   RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
   MovieUtil movieUtil = new MovieUtil();
+
+  @Autowired
+  public DetailPageServiceImpl(LikeDataHandler likeDataHandler, UserDataHandler userDataHandler, ContentDataHandler contentDataHandler) {
+    this.contentDataHandler = contentDataHandler;
+    this.userDataHandler = userDataHandler;
+    this.likeDataHandler = likeDataHandler;
+  }
 
   @Override
   public detailObject getDetail(String path) {
@@ -180,4 +197,63 @@ public class DetailPageServiceImpl implements DetailPageService {
     return detailPageDTO;
   }
 
+  @Override
+  public LikeDTO changeLikeState(LikeDTO likeDTO, Long userId) {
+
+    Boolean currentLike = likeDTO.isCurrentState();
+
+    if (currentLike) {
+      LikeEntity likeEntity = likeDataHandler.getLikeEntity(userId, likeDTO.getTmdbId());
+      likeDataHandler.deleteLikeEntity(likeEntity);
+    }
+    else {
+      Boolean isContent = contentDataHandler.isContentEntityByTmdbId(likeDTO.getTmdbId());
+
+      if (isContent) {
+        ContentEntity contentEntity = contentDataHandler.getContentEntity(likeDTO.getTmdbId());
+        UserEntity userEntity = userDataHandler.getUserEntity(userId);
+        LikeEntity likeEntity =  new LikeEntity(userEntity, contentEntity);
+
+        Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, likeDTO.getTmdbId());
+
+        if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
+      }
+      else {
+        String type = likeDTO.getType();
+        String path = type + "/" + likeDTO.getTmdbId();
+
+        String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+        JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+        int tmdbId = parser.getInt("id");
+
+        String title;
+        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
+        String return_genre = "";
+
+        for (int i=0; i<genre.size(); i++) {
+          return_genre = return_genre + genre.get(i) + ",";
+        }
+        String poster = movieUtil.posterTransducer(parser.get("poster_path"));
+        String overview = parser.getString("overview");
+
+        if (type.equals("movie")) {
+          title = parser.getString("title");
+        }
+        else {
+          title = parser.getString("name");
+        }
+
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(tmdbId, type, title, return_genre, poster,overview);
+        UserEntity userEntity = userDataHandler.getUserEntity(userId);
+        LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
+        Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, tmdbId);
+
+        if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
+      }
+    }
+    LikeDTO return_likeDTO = new LikeDTO(likeDTO.getTmdbId(), likeDTO.getType(), !likeDTO.isCurrentState());
+
+    return return_likeDTO;
+  }
 }
