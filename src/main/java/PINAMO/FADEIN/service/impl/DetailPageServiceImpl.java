@@ -5,9 +5,9 @@ import PINAMO.FADEIN.data.Entity.LikeEntity;
 import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
 import PINAMO.FADEIN.data.dto.movie.LikeDTO;
-import PINAMO.FADEIN.data.object.castObject;
-import PINAMO.FADEIN.data.object.detailObject;
-import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.data.object.CastObject;
+import PINAMO.FADEIN.data.object.DetailObject;
+import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.handler.ContentDataHandler;
 import PINAMO.FADEIN.handler.LikeDataHandler;
 import PINAMO.FADEIN.handler.UserDataHandler;
@@ -39,7 +39,7 @@ public class DetailPageServiceImpl implements DetailPageService {
   }
 
   @Override
-  public detailObject getDetail(String path) {
+  public DetailObject getDetail(String path) {
 
     try {
       String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
@@ -84,7 +84,7 @@ public class DetailPageServiceImpl implements DetailPageService {
       String rating = parser.get("vote_average").toString();
       String overview = parser.getString("overview");
 
-      return new detailObject(contentId, title, originalTitle, poster, backdrop, releaseDate, genre, country, runtime, certification, rating, overview);
+      return new DetailObject(contentId, title, originalTitle, poster, backdrop, releaseDate, genre, country, runtime, certification, rating, overview);
     }
     catch (Exception e) {
       return null;
@@ -92,7 +92,7 @@ public class DetailPageServiceImpl implements DetailPageService {
   }
 
   @Override
-  public List<castObject> getCast(String path) {
+  public List<CastObject> getCast(String path) {
     try {
       path = path + "/" + "credits";
 
@@ -101,7 +101,7 @@ public class DetailPageServiceImpl implements DetailPageService {
 
       JSONArray crews = parser.getJSONArray("crew");
 
-      List<castObject> returnCast = new ArrayList<>();
+      List<CastObject> returnCast = new ArrayList<>();
 
       if (crews.length() != 0) {
         for (int i = 0; i < crews.length(); i++) {
@@ -114,7 +114,7 @@ public class DetailPageServiceImpl implements DetailPageService {
 
             String profile = movieUtil.profileImageTransducer(crew.get("profile_path"), crew.getInt("gender"));
 
-            castObject castObject = new castObject(name, job, profile);
+            CastObject castObject = new CastObject(name, job, profile);
 
             returnCast.add(castObject);
 
@@ -137,12 +137,11 @@ public class DetailPageServiceImpl implements DetailPageService {
 
           String profile = movieUtil.profileImageTransducer(cast.get("profile_path"), cast.getInt("gender"));
 
-          castObject castObject = new castObject(name, role, profile);
+          CastObject castObject = new CastObject(name, role, profile);
 
           returnCast.add(castObject);
         }
       }
-
       return returnCast;
     }
     catch (Exception e) {
@@ -151,7 +150,7 @@ public class DetailPageServiceImpl implements DetailPageService {
   }
 
   @Override
-  public List<movieObject> getSimilarContents(String path) {
+  public List<ContentObject> getSimilarContents(String path) {
     try {
       path = path + "/" + "recommendations";
 
@@ -160,7 +159,7 @@ public class DetailPageServiceImpl implements DetailPageService {
 
       JSONArray similarMovies = parser.getJSONArray("results");
 
-      List<movieObject> returnSimilarMovies = new ArrayList<>();
+      List<ContentObject> returnSimilarMovies = new ArrayList<>();
 
       if (similarMovies.length() != 0) {
         for (int i = 0; i < 5; i++) {
@@ -179,9 +178,9 @@ public class DetailPageServiceImpl implements DetailPageService {
 
           String overview = movie.getString("overview");
 
-          movieObject movieObject = new movieObject(id, type, title, return_genres, poster, overview);
+          ContentObject ContentObject = new ContentObject(id, type, title, return_genres, poster, overview);
 
-          returnSimilarMovies.add(movieObject);
+          returnSimilarMovies.add(ContentObject);
         }
       }
       return returnSimilarMovies;
@@ -192,15 +191,16 @@ public class DetailPageServiceImpl implements DetailPageService {
   }
 
   @Override
-  public DetailPageDTO getDetailPage(detailObject detail, List<castObject> cast, List<movieObject> similarContents) {
-    DetailPageDTO detailPageDTO = new DetailPageDTO(detail, cast, similarContents);
+  public DetailPageDTO getDetailPage(Long userId, DetailObject detail, List<CastObject> cast, List<ContentObject> similarContents) {
+    Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, detail.getTmdbId());
+    DetailPageDTO detailPageDTO = new DetailPageDTO(detail, cast, similarContents, isLike);
     return detailPageDTO;
   }
 
   @Override
   public LikeDTO changeLikeState(LikeDTO likeDTO, Long userId) {
 
-    Boolean currentLike = likeDTO.isCurrentState();
+    Boolean currentLike = likeDTO.isCurrentLike();
 
     if (currentLike) {
       LikeEntity likeEntity = likeDataHandler.getLikeEntity(userId, likeDTO.getTmdbId());
@@ -210,7 +210,7 @@ public class DetailPageServiceImpl implements DetailPageService {
       Boolean isContent = contentDataHandler.isContentEntityByTmdbId(likeDTO.getTmdbId());
 
       if (isContent) {
-        ContentEntity contentEntity = contentDataHandler.getContentEntity(likeDTO.getTmdbId());
+        ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbId(likeDTO.getTmdbId());
         UserEntity userEntity = userDataHandler.getUserEntity(userId);
         LikeEntity likeEntity =  new LikeEntity(userEntity, contentEntity);
 
@@ -228,31 +228,28 @@ public class DetailPageServiceImpl implements DetailPageService {
         int tmdbId = parser.getInt("id");
 
         String title;
+        if (type.equals("movie")) title = parser.getString("title");
+        else title = parser.getString("name");
+
         ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
         String return_genre = "";
-
         for (int i=0; i<genre.size(); i++) {
           return_genre = return_genre + genre.get(i) + ",";
         }
+
         String poster = movieUtil.posterTransducer(parser.get("poster_path"));
         String overview = parser.getString("overview");
-
-        if (type.equals("movie")) {
-          title = parser.getString("title");
-        }
-        else {
-          title = parser.getString("name");
-        }
 
         ContentEntity contentEntity = contentDataHandler.saveContentEntity(tmdbId, type, title, return_genre, poster,overview);
         UserEntity userEntity = userDataHandler.getUserEntity(userId);
         LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
+
         Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, tmdbId);
 
         if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
       }
     }
-    LikeDTO return_likeDTO = new LikeDTO(likeDTO.getTmdbId(), likeDTO.getType(), !likeDTO.isCurrentState());
+    LikeDTO return_likeDTO = new LikeDTO(likeDTO.getTmdbId(), likeDTO.getType(), !likeDTO.isCurrentLike());
 
     return return_likeDTO;
   }

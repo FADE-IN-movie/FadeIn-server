@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -28,8 +29,13 @@ public class ContentDataHandlerImpl implements ContentDataHandler {
   }
 
   @Override
-  public ContentEntity getContentEntity(int tmdbId) {
-    return contentDAO.getContent(tmdbId);
+  public ContentEntity getContentEntityByTmdbId(int tmdbId) {
+    return contentDAO.getContentByTmdbId(tmdbId);
+  }
+
+  @Override
+  public List<ContentEntity> getContentEntitiesByType(String type) {
+    return contentDAO.getContentsByType(type);
   }
 
   @Override

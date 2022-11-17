@@ -15,13 +15,10 @@ import java.util.List;
 public class RecommendEntity {
 
   @Id
+  @GeneratedValue
   private Long id;
-  private int rank;
-  private String type;
-  private String title;
-  private String genre;
-  private String poster;
-  @Column(columnDefinition = "TEXT")
-  private String overview;
+  @ManyToOne
+  @JoinColumn(name ="contentId", referencedColumnName = "id")
+  private ContentEntity contentEntity;
 
 }

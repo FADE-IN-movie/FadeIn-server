@@ -2,9 +2,9 @@ package PINAMO.FADEIN.controller;
 
 import PINAMO.FADEIN.data.dto.movie.LikeDTO;
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
-import PINAMO.FADEIN.data.object.castObject;
-import PINAMO.FADEIN.data.object.detailObject;
-import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.data.object.CastObject;
+import PINAMO.FADEIN.data.object.DetailObject;
+import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.service.DetailPageService;
 import exception.Constants;
 import exception.CustomException;
@@ -41,25 +41,25 @@ public class DetailPageController {
 
     String path = type + "/" + contentId;
 
-    detailObject detail = detailPageService.getDetail(path);
+    DetailObject detail = detailPageService.getDetail(path);
     if (detail == null) {
       LOGGER.error("ERROR OCCUR IN GETTING DETAILS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    List<castObject> cast = detailPageService.getCast(path);
+    List<CastObject> cast = detailPageService.getCast(path);
     if (cast == null) {
       LOGGER.error("ERROR OCCUR IN GETTING CASTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    List<movieObject> similarContents = detailPageService.getSimilarContents(path);
+    List<ContentObject> similarContents = detailPageService.getSimilarContents(path);
     if (similarContents == null) {
       LOGGER.error("ERROR OCCUR IN GETTING SIMILAR CONTENTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    return detailPageService.getDetailPage(detail, cast, similarContents);
+    return detailPageService.getDetailPage((long) 1, detail, cast, similarContents);
   }
 
   @PostMapping(value = "/like")
@@ -67,14 +67,11 @@ public class DetailPageController {
 
     LOGGER.info("CHANGE LIKE STATUS.");
 
-    boolean currentStatus = changeLikeDTO.isCurrentStatus();
+    boolean currentStatus = changeLikeDTO.isCurrentLike();
 
-    if (currentStatus) {
-
-    }
     header.get("userId");
 
-    return detailPageService.changeLikeStatue(changeLikeDTO, (long) 1);
+    return detailPageService.changeLikeState(changeLikeDTO, (long) 1);
   }
 
 //  @PostMapping(value = "/recommend")

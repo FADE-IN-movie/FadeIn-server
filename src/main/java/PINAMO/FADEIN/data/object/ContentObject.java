@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class movieObject {
+public class ContentObject {
   private int id;
   private int rank;
   private String type;
@@ -18,7 +18,7 @@ public class movieObject {
   private String poster;
   private String overview;
 
-  public movieObject(int id, String type, String title, List<String> genre, String poster, String overview) {
+  public ContentObject(int id, String type, String title, List<String> genre, String poster, String overview) {
     this.id = id;
     this.type = type;
     this.title = title;

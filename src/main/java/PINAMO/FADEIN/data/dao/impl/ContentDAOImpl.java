@@ -7,6 +7,8 @@ import PINAMO.FADEIN.data.repository.ContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ContentDAOImpl implements ContentDAO {
 
@@ -24,9 +26,15 @@ public class ContentDAOImpl implements ContentDAO {
   }
 
   @Override
-  public ContentEntity getContent(int tmdbId) {
+  public ContentEntity getContentByTmdbId(int tmdbId) {
     ContentEntity contentEntity = contentRepository.getContentEntityByTmdbId(tmdbId);
     return contentEntity;
+  }
+
+  @Override
+  public List<ContentEntity> getContentsByType(String type) {
+    List<ContentEntity> contentEntities = contentRepository.findAllByType(type);
+    return contentEntities;
   }
 
   @Override

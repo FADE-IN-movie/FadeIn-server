@@ -11,6 +11,6 @@ public class LikeDTO {
 
   private int tmdbId;
   private String type;
-  private boolean currentState;
+  private boolean currentLike;
 
 }

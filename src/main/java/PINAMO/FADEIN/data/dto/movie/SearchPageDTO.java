@@ -1,6 +1,6 @@
 package PINAMO.FADEIN.data.dto.movie;
 
-import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.data.object.ContentObject;
 import lombok.*;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class SearchPageDTO {
 
-  private List<movieObject> search;
+  private List<ContentObject> search;
 
 }
 

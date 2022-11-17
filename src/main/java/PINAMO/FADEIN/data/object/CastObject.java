@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class castObject {
+public class CastObject {
 
   private String name;
   private String role;

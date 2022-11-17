@@ -2,20 +2,19 @@ package PINAMO.FADEIN.service;
 
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
 import PINAMO.FADEIN.data.dto.movie.LikeDTO;
-import PINAMO.FADEIN.data.object.castObject;
-import PINAMO.FADEIN.data.object.detailObject;
-import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.data.object.CastObject;
+import PINAMO.FADEIN.data.object.DetailObject;
+import PINAMO.FADEIN.data.object.ContentObject;
 
 import java.util.List;
-import java.util.Map;
 
 public interface DetailPageService {
 
-  detailObject getDetail(String path);
-  List<castObject> getCast(String path);
-  List<movieObject> getSimilarContents(String path);
+  DetailObject getDetail(String path);
+  List<CastObject> getCast(String path);
+  List<ContentObject> getSimilarContents(String path);
 
-  DetailPageDTO getDetailPage(detailObject detail, List<castObject> cast, List<movieObject> getSimilarContents);
+  DetailPageDTO getDetailPage(Long userId, DetailObject detail, List<CastObject> cast, List<ContentObject> getSimilarContents);
 
   LikeDTO changeLikeState(LikeDTO likeDTO, Long userId);
 }

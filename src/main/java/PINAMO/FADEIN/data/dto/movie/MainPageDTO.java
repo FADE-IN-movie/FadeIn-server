@@ -1,6 +1,6 @@
 package PINAMO.FADEIN.data.dto.movie;
 
-import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.data.object.ContentObject;
 import lombok.*;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Builder
 public class MainPageDTO {
 
-  private List<movieObject> popular;
-  private List<movieObject> topRate;
-  private List<movieObject> nowPlaying;
-  private List<movieObject> preference;
-  private List<movieObject> recommend;
+  private List<ContentObject> popular;
+  private List<ContentObject> topRate;
+  private List<ContentObject> nowPlaying;
+  private List<ContentObject> preference;
+  private List<ContentObject> recommend;
 
 }
 

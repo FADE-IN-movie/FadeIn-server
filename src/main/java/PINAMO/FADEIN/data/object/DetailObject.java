@@ -9,9 +9,9 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class detailObject {
+public class DetailObject {
 
-  private int id;
+  private int tmdbId;
   private String title;
   private String originalTitle;
   private String poster;

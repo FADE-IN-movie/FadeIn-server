@@ -1,6 +1,6 @@
 package PINAMO.FADEIN.controller;
 
-import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
 import PINAMO.FADEIN.service.MainPageService;
 import exception.Constants;
@@ -31,36 +31,41 @@ public class MainPageController {
     this.mainPageService = mainPageService;
   }
 
+  @PostMapping(value = "/save")
+  public void saveRecommend(@RequestBody String type) {
+    mainPageService.saveRecommend(type);
+  }
+
   @GetMapping(value = "")
   public MainPageDTO getMainPage(@RequestParam String type) throws CustomException{
 
     LOGGER.info("GET "+ type.toUpperCase() + " CONTENTS.");
 
-    List<movieObject> popular = mainPageService.getPopular(type);
+    List<ContentObject> popular = mainPageService.getPopular(type);
     if (popular == null) {
       LOGGER.error("ERROR OCCUR IN GETTING POPULAR CONTENTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    List<movieObject> topRate = mainPageService.getTopRate(type);
+    List<ContentObject> topRate = mainPageService.getTopRate(type);
     if (topRate == null) {
       LOGGER.error("ERROR OCCUR IN GETTING TOP RATED CONTENTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    List<movieObject> nowPlaying = mainPageService.getNowPlaying(type);
+    List<ContentObject> nowPlaying = mainPageService.getNowPlaying(type);
     if (nowPlaying == null) {
       LOGGER.error("ERROR OCCUR IN GETTING NOW PLAYING CONTENTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    List<movieObject> preference = mainPageService.getPopular(type);
+    List<ContentObject> preference = mainPageService.getPopular(type);
     if (preference == null) {
       LOGGER.error("ERROR OCCUR IN GETTING PREFERENCE CONTENTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    List<movieObject> recommend = mainPageService.getRecommend(type);
+    List<ContentObject> recommend = mainPageService.getRecommend(type);
     if (recommend == null) {
       LOGGER.error("ERROR OCCUR IN GETTING RECOMMEND CONTENTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");

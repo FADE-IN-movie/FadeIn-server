@@ -1,8 +1,8 @@
 package PINAMO.FADEIN.data.dto.movie;
 
-import PINAMO.FADEIN.data.object.castObject;
-import PINAMO.FADEIN.data.object.detailObject;
-import PINAMO.FADEIN.data.object.movieObject;
+import PINAMO.FADEIN.data.object.CastObject;
+import PINAMO.FADEIN.data.object.DetailObject;
+import PINAMO.FADEIN.data.object.ContentObject;
 import lombok.*;
 
 import java.util.List;
@@ -14,8 +14,9 @@ import java.util.List;
 @Builder
 public class DetailPageDTO {
 
-  private detailObject data;
-  private List<castObject> cast;
-  private List<movieObject> similarContent;
+  private DetailObject data;
+  private List<CastObject> cast;
+  private List<ContentObject> similarContent;
+  private boolean currentLike;
 
 }
