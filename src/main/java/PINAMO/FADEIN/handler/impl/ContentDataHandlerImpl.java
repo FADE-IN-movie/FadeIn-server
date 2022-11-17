@@ -22,10 +22,13 @@ public class ContentDataHandlerImpl implements ContentDataHandler {
   }
 
   @Override
-  public ContentEntity saveContentEntity(int tmdbId, String type, String title, String genre, String poster, String overview) {
-    ContentEntity contentEntity = new ContentEntity(tmdbId, type, title, genre, poster, overview);
-
+  public ContentEntity saveContentEntity(ContentEntity contentEntity) {
     return contentDAO.saveContent(contentEntity);
+  }
+
+  @Override
+  public ContentEntity getContentEntity(Long contentId) {
+    return contentDAO.getContent(contentId);
   }
 
   @Override

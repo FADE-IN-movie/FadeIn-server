@@ -7,6 +7,7 @@ import java.util.List;
 public interface ContentDAO {
   ContentEntity saveContent(ContentEntity contentEntity);
 
+  ContentEntity getContent(Long contentId);
   ContentEntity getContentByTmdbId(int tmdbId);
   List<ContentEntity> getContentsByType(String type);
 

@@ -1,9 +1,15 @@
 package PINAMO.FADEIN.service.impl;
 
 import PINAMO.FADEIN.data.Entity.ContentEntity;
+import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
+import PINAMO.FADEIN.data.Entity.LikeEntity;
+import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
 import PINAMO.FADEIN.handler.ContentDataHandler;
+import PINAMO.FADEIN.handler.ContentGenreDataHandler;
+import PINAMO.FADEIN.handler.LikeDataHandler;
+import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.MainPageService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +27,16 @@ public class MainPageServiceImpl implements MainPageService {
   RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
 
   ContentDataHandler contentDataHandler;
+  ContentGenreDataHandler contentGenreDataHandler;
+  UserDataHandler userDataHandler;
+  LikeDataHandler likeDataHandler;
 
   @Autowired
-  public MainPageServiceImpl(ContentDataHandler contentDataHandler) {
+  public MainPageServiceImpl(ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler, UserDataHandler userDataHandler, LikeDataHandler likeDataHandler) {
+    this.likeDataHandler = likeDataHandler;
     this.contentDataHandler = contentDataHandler;
+    this.contentGenreDataHandler = contentGenreDataHandler;
+    this.userDataHandler = userDataHandler;
   }
 
   @Override
@@ -68,8 +80,22 @@ public class MainPageServiceImpl implements MainPageService {
   }
 
   @Override
-  public List<ContentObject> getPreference(String type) {
-    return null;
+  public List<ContentObject> getPreference(Long userId, String type) {
+    try {
+//      List<ContentObject> result;
+//      if (userDataHandler.isUserEntity(userId)){
+//        List<LikeEntity> likeEntities = likeDataHandler.getLikeEntitiesByUserId(userId);
+//
+//        for (int i=0; i<)
+//        ContentEntity contentEntity = contentDataHandler.getContentEntity()
+//
+//        result = movieUtil.getMovies(type, "discover", 1, "")
+//      }
+      return null;
+    }
+    catch (Exception e) {
+      return null;
+    }
   }
 
   @Override
@@ -85,17 +111,19 @@ public class MainPageServiceImpl implements MainPageService {
       ArrayList<Integer> randomIndex = new ArrayList<>(randomIndexSet);
 
       for (int i=0; i<randomIndex.size(); i++) {
-        int tmdbId = contentEntities.get(randomIndex.get(i)).getTmdbId();
-        String title = contentEntities.get(randomIndex.get(i)).getTitle();
-        ArrayList<String> genre = new ArrayList<>(Arrays.asList(contentEntities.get(randomIndex.get(i)).getGenre().split(",")));
+        ContentEntity randomContent = contentEntities.get(randomIndex.get(i));
+        int tmdbId = randomContent.getTmdbId();
+        String title = randomContent.getTitle();
+        ArrayList<ContentGenreEntity> contentGenreEntities = contentGenreDataHandler.getContentGenreEntitiesByContentId(randomContent.getId());
+        List<String> returnGenre = new ArrayList<>();
+        for (int j=0; j<contentGenreEntities.size(); j++) returnGenre.add(contentGenreEntities.get(j).getGenre());
         String poster = contentEntities.get(randomIndex.get(i)).getPoster();
         String overview = contentEntities.get(randomIndex.get(i)).getOverview();
 
-        ContentObject ContentObject = new ContentObject(tmdbId,type,title,genre,poster,overview);
+        ContentObject ContentObject = new ContentObject(tmdbId,type,title,returnGenre,poster,overview);
 
         result.add(ContentObject);
       }
-
       return result;
     }
     catch (Exception e) {
@@ -124,19 +152,14 @@ public class MainPageServiceImpl implements MainPageService {
         JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
         int tmdbId = parser.getInt("id");
-
         String title = parser.getString("title");
-
-        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
-        String return_genre = "";
-        for (int j=0; j<genre.size(); j++) {
-          return_genre = return_genre + genre.get(j) + ",";
-        }
-
         String poster = movieUtil.posterTransducer(parser.get("poster_path"));
         String overview = parser.getString("overview");
 
-        contentDataHandler.saveContentEntity(tmdbId, type, title, return_genre, poster, overview);
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(new ContentEntity(tmdbId, type, title, poster, overview));
+
+        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
+        for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
       }
     }
     else {
@@ -147,19 +170,14 @@ public class MainPageServiceImpl implements MainPageService {
         JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
         int tmdbId = parser.getInt("id");
-
         String title = parser.getString("name");
-
-        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
-        String return_genre = "";
-        for (int j=0; j<genre.size(); j++) {
-          return_genre = return_genre + genre.get(j) + ",";
-        }
-
         String poster = movieUtil.posterTransducer(parser.get("poster_path"));
         String overview = parser.getString("overview");
 
-        contentDataHandler.saveContentEntity(tmdbId, type, title, return_genre, poster, overview);
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(new ContentEntity(tmdbId, type, title, poster, overview));
+
+        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
+        for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
       }
     }
   }

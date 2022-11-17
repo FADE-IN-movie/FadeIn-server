@@ -66,10 +66,10 @@ public class MainPageController {
     }
 
     List<ContentObject> recommend = mainPageService.getRecommend(type);
-    if (recommend == null) {
-      LOGGER.error("ERROR OCCUR IN GETTING RECOMMEND CONTENTS.");
-      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
-    }
+//    if (recommend == null) {
+//      LOGGER.error("ERROR OCCUR IN GETTING RECOMMEND CONTENTS.");
+//      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+//    }
 
     return mainPageService.getMainPage(popular, topRate, nowPlaying, preference, recommend);
   }

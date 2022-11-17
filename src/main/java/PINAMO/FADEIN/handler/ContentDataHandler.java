@@ -6,8 +6,9 @@ import java.util.List;
 
 public interface ContentDataHandler {
 
-  ContentEntity saveContentEntity(int tmdbId, String type, String title, String genre, String poster, String overview);
+  ContentEntity saveContentEntity(ContentEntity contentEntity);
 
+  ContentEntity getContentEntity(Long contentId);
   ContentEntity getContentEntityByTmdbId(int tmdbId);
   List<ContentEntity> getContentEntitiesByType(String type);
 

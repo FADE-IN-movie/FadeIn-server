@@ -1,6 +1,5 @@
 package PINAMO.FADEIN.data.dao.impl;
 
-import PINAMO.FADEIN.data.Entity.ContentEntity;
 import PINAMO.FADEIN.data.Entity.LikeEntity;
 import PINAMO.FADEIN.data.Entity.RecommendEntity;
 import PINAMO.FADEIN.data.Entity.UserEntity;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -37,8 +37,12 @@ public class LikeDAOImpl implements LikeDAO {
 
     @Override
     public LikeEntity getLike(Long userId, int tmdbId) {
-        LikeEntity likeEntity = likeRepository.findByUserEntity_IdAndContentEntity_TmdbId(userId, tmdbId);
-        return likeEntity;
+        return likeRepository.findByUserEntity_IdAndContentEntity_TmdbId(userId, tmdbId);
+    }
+
+    @Override
+    public List<LikeEntity> getLikesByUserId(Long userId) {
+        return likeRepository.findAllByUserEntity_Id(userId);
     }
 
     @Override

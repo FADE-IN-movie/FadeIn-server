@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -29,6 +30,11 @@ public class LikeDataHandlerImpl implements LikeDataHandler {
   @Override
   public LikeEntity getLikeEntity(Long userId, int tmdbId) {
     return likeDAO.getLike(userId, tmdbId);
+  }
+
+  @Override
+  public List<LikeEntity> getLikeEntitiesByUserId(Long userId) {
+    return likeDAO.getLikesByUserId(userId);
   }
 
   @Override

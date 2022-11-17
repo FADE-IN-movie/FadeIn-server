@@ -7,6 +7,7 @@ public interface UserDAO {
     UserEntity saveUser(UserEntity userEntity);
 
     UserEntity getUser(Long userId);
-
     UserEntity getUserByEmail(String Email);
+
+    boolean isUser(Long userId);
 }

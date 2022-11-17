@@ -26,6 +26,11 @@ public class ContentDAOImpl implements ContentDAO {
   }
 
   @Override
+  public ContentEntity getContent(Long contentId) {
+    return contentRepository.getReferenceById(contentId);
+  }
+
+  @Override
   public ContentEntity getContentByTmdbId(int tmdbId) {
     ContentEntity contentEntity = contentRepository.getContentEntityByTmdbId(tmdbId);
     return contentEntity;

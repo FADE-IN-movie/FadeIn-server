@@ -7,7 +7,8 @@ public interface UserDataHandler {
   UserEntity saveUserEntity(String userEmail, String userName, String userPicture);
 
   UserEntity getUserEntity(Long userId);
-
   UserEntity getUserEntityByEmail(String userEmail);
+
+  boolean isUserEntity(Long userId);
 
 }

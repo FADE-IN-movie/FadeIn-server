@@ -31,15 +31,17 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public UserEntity getUser(Long userId) {
-        UserEntity userEntity = userRepository.getReferenceById(userId);
-
-        return userEntity;
+        return userRepository.getReferenceById(userId);
     }
 
     @Override
     public UserEntity getUserByEmail(String userEmail) {
-        UserEntity userEntity = userRepository.getByUserEmail(userEmail);
-        return userEntity;
+        return userRepository.getByUserEmail(userEmail);
+    }
+
+    @Override
+    public boolean isUser(Long userId) {
+        return userRepository.existsById(userId);
     }
 
     @ExceptionHandler(value = CustomException.class)

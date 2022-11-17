@@ -1,6 +1,7 @@
 package PINAMO.FADEIN.service.impl;
 
 import PINAMO.FADEIN.data.Entity.ContentEntity;
+import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
 import PINAMO.FADEIN.data.Entity.LikeEntity;
 import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
@@ -9,6 +10,7 @@ import PINAMO.FADEIN.data.object.CastObject;
 import PINAMO.FADEIN.data.object.DetailObject;
 import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.handler.ContentDataHandler;
+import PINAMO.FADEIN.handler.ContentGenreDataHandler;
 import PINAMO.FADEIN.handler.LikeDataHandler;
 import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.DetailPageService;
@@ -27,15 +29,17 @@ public class DetailPageServiceImpl implements DetailPageService {
   LikeDataHandler likeDataHandler;
   UserDataHandler userDataHandler;
   ContentDataHandler contentDataHandler;
+  ContentGenreDataHandler contentGenreDataHandler;
 
   RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
   MovieUtil movieUtil = new MovieUtil();
 
   @Autowired
-  public DetailPageServiceImpl(LikeDataHandler likeDataHandler, UserDataHandler userDataHandler, ContentDataHandler contentDataHandler) {
-    this.contentDataHandler = contentDataHandler;
-    this.userDataHandler = userDataHandler;
+  public DetailPageServiceImpl(LikeDataHandler likeDataHandler, UserDataHandler userDataHandler, ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler) {
     this.likeDataHandler = likeDataHandler;
+    this.userDataHandler = userDataHandler;
+    this.contentDataHandler = contentDataHandler;
+    this.contentGenreDataHandler = contentGenreDataHandler;
   }
 
   @Override
@@ -231,18 +235,15 @@ public class DetailPageServiceImpl implements DetailPageService {
         if (type.equals("movie")) title = parser.getString("title");
         else title = parser.getString("name");
 
-        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
-        String return_genre = "";
-        for (int i=0; i<genre.size(); i++) {
-          return_genre = return_genre + genre.get(i) + ",";
-        }
-
         String poster = movieUtil.posterTransducer(parser.get("poster_path"));
         String overview = parser.getString("overview");
 
-        ContentEntity contentEntity = contentDataHandler.saveContentEntity(tmdbId, type, title, return_genre, poster,overview);
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(new ContentEntity(tmdbId, type, title, poster,overview));
         UserEntity userEntity = userDataHandler.getUserEntity(userId);
         LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
+
+        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
+        for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
 
         Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, tmdbId);
 

@@ -29,14 +29,17 @@ public class UserDataHandlerImpl implements UserDataHandler {
 
   @Override
   public UserEntity getUserEntity(Long userId) {
-
-
     return userDAO.getUser(userId);
   }
 
   @Override
   public UserEntity getUserEntityByEmail(String userEmail) {
     return userDAO.getUserByEmail(userEmail);
+  }
+
+  @Override
+  public boolean isUserEntity(Long userId) {
+    return userDAO.isUser(userId);
   }
 
 }
