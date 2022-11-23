@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/reviews")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class WritePageController {
 
   private WritePageService writePageService;

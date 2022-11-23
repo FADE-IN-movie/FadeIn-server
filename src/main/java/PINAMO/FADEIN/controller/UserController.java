@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserController {
 
   private UserService userService;

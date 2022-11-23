@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/contents")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MainPageController {
 
   private MainPageService mainPageService;

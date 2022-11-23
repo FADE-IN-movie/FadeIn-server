@@ -170,11 +170,11 @@ public class MovieUtil {
     String path;
     int size = 10;
 
-    if (!menu.equals("search") || !menu.equals("discover")) path = type + "/" + menu;
-    else path = menu + "/" + type;
+    if (menu.equals("search") || menu.equals("discover")) path = menu + "/" + type;
+    else path = type + "/" + menu;
 
     String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko%s&page=%d", path, query, page);
-
+    System.out.println(requestURL);
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
     JSONArray arrayList = parser.getJSONArray("results");

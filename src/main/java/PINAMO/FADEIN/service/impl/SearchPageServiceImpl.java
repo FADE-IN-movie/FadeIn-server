@@ -13,19 +13,27 @@ public class SearchPageServiceImpl implements SearchPageService {
 
   @Override
   public SearchPageDTO getSearchPage(String type, String keyword, int page) {
+    try {
+      String query = "&query=" + keyword;
 
-    String query = "&query=" + keyword;
+      SearchPageDTO searchPageDTO = new SearchPageDTO(movieUtil.getMovies(type, "search", page, query));
 
-    SearchPageDTO searchPageDTO = new SearchPageDTO(movieUtil.getMovies(type, "search", page, query));
-
-    return searchPageDTO;
+      return searchPageDTO;
+    }
+    catch (Exception e) {
+      return null;
+    }
   }
 
   @Override
   public SearchLengthDTO getSearchLength(String keyword) {
+    try {
+      SearchLengthDTO searchLengthDTO = movieUtil.getSearchLength(keyword);
 
-    SearchLengthDTO searchLengthDTO = movieUtil.getSearchLength(keyword);
-
-    return searchLengthDTO;
+      return searchLengthDTO;
+    }
+    catch (Exception e) {
+      return null;
+    }
   }
 }
