@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import utils.JwtUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +24,9 @@ import java.util.Map;
 public class MainPageController {
 
   private MainPageService mainPageService;
-
   private final Logger LOGGER = LoggerFactory.getLogger(MainPageController.class);
+
+  JwtUtil jwtUtil = new JwtUtil();
 
   @Autowired
   public MainPageController(MainPageService mainPageService) {
@@ -37,7 +39,12 @@ public class MainPageController {
   }
 
   @GetMapping(value = "")
-  public MainPageDTO getMainPage(@RequestParam String type) throws CustomException{
+  public MainPageDTO getMainPage(@RequestParam String type, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+
+    int userId = 0;
+    if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
+
+    System.out.println(userId);
 
     LOGGER.info("GET "+ type.toUpperCase() + " CONTENTS.");
 

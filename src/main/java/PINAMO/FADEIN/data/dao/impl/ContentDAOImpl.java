@@ -31,8 +31,8 @@ public class ContentDAOImpl implements ContentDAO {
   }
 
   @Override
-  public ContentEntity getContentByTmdbId(int tmdbId) {
-    ContentEntity contentEntity = contentRepository.getContentEntityByTmdbId(tmdbId);
+  public ContentEntity getContentByTmdbIdAndType(int tmdbId, String type) {
+    ContentEntity contentEntity = contentRepository.getContentEntityByTmdbIdAndType(tmdbId, type);
     return contentEntity;
   }
 
@@ -43,7 +43,7 @@ public class ContentDAOImpl implements ContentDAO {
   }
 
   @Override
-  public Boolean isContentByTmdbId(int tmdbId) {
-    return contentRepository.existsByTmdbId(tmdbId);
+  public Boolean isContentByTmdbIdAndType(int tmdbId, String type) {
+    return contentRepository.existsByTmdbIdAndType(tmdbId, type);
   }
 }

@@ -47,8 +47,10 @@ public class JwtUtil {
         .compact();
   }
 
-  public boolean checkClaim(String jwt) {
+  public boolean checkClaim(String accessToken) {
     try {
+      String jwt = accessToken.split(" ")[1];
+
       Claims claims = Jwts.parser()
           .setSigningKey(secretKey.getBytes())
           .parseClaimsJws(jwt).getBody();
@@ -63,11 +65,25 @@ public class JwtUtil {
   }
 
   @Bean
-  public Claims parseJwtToken(String token) {
+  public Claims parseJwtToken(String accessToken) {
+    String jwt = accessToken.split(" ")[1];
 
     return Jwts.parser()
         .setSigningKey(Base64.getEncoder().encodeToString(secretKey.getBytes()))
-        .parseClaimsJws(token)
+        .parseClaimsJws(jwt)
         .getBody();
+  }
+
+  @Bean
+  public int getUserIdInJwtToken(String accessToken) {
+    String jwt = accessToken.split(" ")[1];
+
+    return Integer.parseInt(
+        Jwts.parser()
+        .setSigningKey(Base64.getEncoder().encodeToString(secretKey.getBytes()))
+        .parseClaimsJws(jwt)
+        .getBody()
+        .get("id")
+        .toString());
   }
 }

@@ -8,8 +8,8 @@ public interface ContentDAO {
   ContentEntity saveContent(ContentEntity contentEntity);
 
   ContentEntity getContent(Long contentId);
-  ContentEntity getContentByTmdbId(int tmdbId);
+  ContentEntity getContentByTmdbIdAndType(int tmdbId, String type);
   List<ContentEntity> getContentsByType(String type);
 
-  Boolean isContentByTmdbId(int tmdbId);
+  Boolean isContentByTmdbIdAndType(int tmdbId, String type);
 }

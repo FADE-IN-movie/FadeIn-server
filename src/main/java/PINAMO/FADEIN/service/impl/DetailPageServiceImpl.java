@@ -211,10 +211,10 @@ public class DetailPageServiceImpl implements DetailPageService {
       likeDataHandler.deleteLikeEntity(likeEntity);
     }
     else {
-      Boolean isContent = contentDataHandler.isContentEntityByTmdbId(likeDTO.getTmdbId());
+      Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
 
       if (isContent) {
-        ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbId(likeDTO.getTmdbId());
+        ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
         UserEntity userEntity = userDataHandler.getUserEntity(userId);
         LikeEntity likeEntity =  new LikeEntity(userEntity, contentEntity);
 

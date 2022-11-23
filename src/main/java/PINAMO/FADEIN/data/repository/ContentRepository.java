@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface ContentRepository extends JpaRepository<ContentEntity, Long> {
 
-  ContentEntity getContentEntityByTmdbId(int tmdbId);
+  ContentEntity getContentEntityByTmdbIdAndType(int tmdbId, String type);
 
   List<ContentEntity> findAllByType(String type);
 
-  Boolean existsByTmdbId(int tmdbId);
+  Boolean existsByTmdbIdAndType(int tmdbId, String type);
 
 }

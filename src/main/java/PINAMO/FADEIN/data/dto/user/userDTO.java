@@ -8,8 +8,10 @@ import lombok.*;
 @ToString
 @Builder
 public class userDTO {
+
   private Long id;
   private String userEmail;
   private String userName;
   private String userImg;
+
 }

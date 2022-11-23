@@ -32,8 +32,8 @@ public class ContentDataHandlerImpl implements ContentDataHandler {
   }
 
   @Override
-  public ContentEntity getContentEntityByTmdbId(int tmdbId) {
-    return contentDAO.getContentByTmdbId(tmdbId);
+  public ContentEntity getContentEntityByTmdbIdAndType(int tmdbId, String type) {
+    return contentDAO.getContentByTmdbIdAndType(tmdbId,type);
   }
 
   @Override
@@ -42,8 +42,8 @@ public class ContentDataHandlerImpl implements ContentDataHandler {
   }
 
   @Override
-  public Boolean isContentEntityByTmdbId(int tmdbId) {
-    return contentDAO.isContentByTmdbId(tmdbId);
+  public Boolean isContentEntityByTmdbIdAndType(int tmdbId, String type) {
+    return contentDAO.isContentByTmdbIdAndType(tmdbId, type);
   }
 
 }

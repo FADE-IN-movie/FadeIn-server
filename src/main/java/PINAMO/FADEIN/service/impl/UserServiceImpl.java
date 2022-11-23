@@ -41,13 +41,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public userDTO getUser(Long userId) {
+  public UserEntity getUser(Long userId) {
     try {
-      UserEntity userEntity = userDataHandler.getUserEntity(userId);
-
-      userDTO userDTO = new userDTO(userEntity.getId(), userEntity.getUserEmail(), userEntity.getUserName(), userEntity.getUserImg());
-
-      return userDTO;
+      return userDataHandler.getUserEntity(userId);
     }
     catch (Exception e) {
       return null;

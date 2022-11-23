@@ -1,5 +1,6 @@
 package PINAMO.FADEIN.controller;
 
+import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.user.loginDTO;
 import PINAMO.FADEIN.data.dto.user.accessTokenDTO;
 import PINAMO.FADEIN.data.dto.user.userDTO;
@@ -32,10 +33,10 @@ public class UserController {
   }
 
   @GetMapping(value = "/{userId}")
-  public userDTO getUser(@PathVariable Long userId) throws CustomException {
+  public UserEntity getUser(@PathVariable Long userId) throws CustomException {
 
     LOGGER.info("GET USER INFORMATION.");
-    userDTO result = userService.getUser(userId);
+    UserEntity result = userService.getUser(userId);
 
     if (result == null) {
       LOGGER.error("NOT EXIST USER.");

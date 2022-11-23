@@ -9,9 +9,9 @@ public interface ContentDataHandler {
   ContentEntity saveContentEntity(ContentEntity contentEntity);
 
   ContentEntity getContentEntity(Long contentId);
-  ContentEntity getContentEntityByTmdbId(int tmdbId);
+  ContentEntity getContentEntityByTmdbIdAndType(int tmdbId, String type);
   List<ContentEntity> getContentEntitiesByType(String type);
 
-  Boolean isContentEntityByTmdbId(int tmdbId);
+  Boolean isContentEntityByTmdbIdAndType(int tmdbId, String type);
 
 }

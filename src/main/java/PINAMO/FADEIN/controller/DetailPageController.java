@@ -8,6 +8,7 @@ import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.service.DetailPageService;
 import exception.Constants;
 import exception.CustomException;
+import io.jsonwebtoken.Claims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import utils.JwtUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +28,9 @@ import java.util.Map;
 public class DetailPageController {
 
   private DetailPageService detailPageService;
-
   private final Logger LOGGER = LoggerFactory.getLogger(DetailPageController.class);
+
+  JwtUtil jwtUtil = new JwtUtil();
 
   @Autowired
   public DetailPageController(DetailPageService detailPageService) {
@@ -35,7 +38,12 @@ public class DetailPageController {
   }
 
   @GetMapping(value = "/{contentId}")
-  public DetailPageDTO getDetailPage(@PathVariable int contentId, @RequestParam String type) throws CustomException{
+  public DetailPageDTO getDetailPage(@PathVariable int contentId, @RequestParam String type, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+
+    int userId = 0;
+    if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
+
+    System.out.println(userId);
 
     LOGGER.info("GET CONTENT DETAIL.");
 
@@ -59,19 +67,22 @@ public class DetailPageController {
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    return detailPageService.getDetailPage((long) 1, detail, cast, similarContents);
+    return detailPageService.getDetailPage((long) userId, detail, cast, similarContents);
   }
 
   @PostMapping(value = "/like")
-  public LikeDTO changeLikeStatus(@RequestBody LikeDTO changeLikeDTO, @RequestHeader Map<String, String> header) {
+  public LikeDTO changeLikeStatus(@RequestBody LikeDTO changeLikeDTO, @RequestHeader(value = "authorization", required=false) String accessToken) {
+
+    int userId = 0;
+    if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
+
+    System.out.println(userId);
 
     LOGGER.info("CHANGE LIKE STATUS.");
 
     boolean currentStatus = changeLikeDTO.isCurrentLike();
 
-    header.get("userId");
-
-    return detailPageService.changeLikeState(changeLikeDTO, (long) 1);
+    return detailPageService.changeLikeState(changeLikeDTO, (long) userId);
   }
 
 //  @PostMapping(value = "/recommend")

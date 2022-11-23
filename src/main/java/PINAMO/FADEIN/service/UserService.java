@@ -1,5 +1,6 @@
 package PINAMO.FADEIN.service;
 
+import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.user.accessTokenDTO;
 import PINAMO.FADEIN.data.dto.user.loginDTO;
 import PINAMO.FADEIN.data.dto.user.userDTO;
@@ -9,7 +10,7 @@ public interface UserService {
 
   loginDTO saveUser(Long id, String userEmail, String userName, String userPicture);
 
-  userDTO getUser(Long userId) throws CustomException;
+  UserEntity getUser(Long userId) throws CustomException;
 
   loginDTO loginGoogleUser(String accessToken);
 
