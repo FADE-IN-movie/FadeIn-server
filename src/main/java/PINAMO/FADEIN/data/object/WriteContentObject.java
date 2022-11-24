@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class WriteContentObject {
 
-  private int id;
+  private int tmdbId;
   private String title;
   private String originalTitle;
   private String poster;

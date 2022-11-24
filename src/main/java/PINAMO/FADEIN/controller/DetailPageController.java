@@ -38,14 +38,12 @@ public class DetailPageController {
   }
 
   @GetMapping(value = "/{contentId}")
-  public DetailPageDTO getDetailPage(@PathVariable int contentId, @RequestParam String type, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+  public DetailPageDTO getDetailPage(@PathVariable int contentId, @RequestParam(defaultValue = "movie", required = false) String type, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+
+    LOGGER.info("GET CONTENT DETAIL.");
 
     int userId = 0;
     if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
-
-    System.out.println(userId);
-
-    LOGGER.info("GET CONTENT DETAIL.");
 
     String path = type + "/" + contentId;
 
@@ -73,12 +71,10 @@ public class DetailPageController {
   @PostMapping(value = "/like")
   public LikeDTO changeLikeStatus(@RequestBody LikeDTO changeLikeDTO, @RequestHeader(value = "authorization", required=false) String accessToken) {
 
+    LOGGER.info("CHANGE LIKE STATUS.");
+
     int userId = 0;
     if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
-
-    System.out.println(userId);
-
-    LOGGER.info("CHANGE LIKE STATUS.");
 
     boolean currentStatus = changeLikeDTO.isCurrentLike();
 

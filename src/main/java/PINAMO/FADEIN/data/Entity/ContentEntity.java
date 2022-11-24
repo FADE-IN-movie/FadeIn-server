@@ -19,15 +19,19 @@ public class ContentEntity {
   private int tmdbId;
   private String type;
   private String title;
+  private String originalTitle;
   private String poster;
+  private int runtime;
   @Column(columnDefinition = "TEXT")
   private String overview;
 
-  public ContentEntity(int tmdbId, String type, String title, String poster, String overview) {
+  public ContentEntity(int tmdbId, String type, String title, String originalTitle, String poster, int runtime, String overview) {
     this.tmdbId = tmdbId;
     this.type = type;
     this.title = title;
+    this.originalTitle = originalTitle;
     this.poster = poster;
+    this.runtime = runtime;
     this.overview = overview;
   }
 

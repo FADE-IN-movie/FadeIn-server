@@ -1,8 +1,9 @@
 package PINAMO.FADEIN.controller;
 
-import PINAMO.FADEIN.data.Entity.ReviewEntity;
 import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
+import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
 import PINAMO.FADEIN.data.object.WriteContentObject;
+import PINAMO.FADEIN.data.object.WriteReviewObject;
 import PINAMO.FADEIN.service.WritePageService;
 import exception.Constants;
 import exception.CustomException;
@@ -33,8 +34,11 @@ public class WritePageController {
     this.writePageService = writePageService;
   }
 
-  @GetMapping(value = "/{contentId}")
-  public WriteContentObject getWritePage(@PathVariable int contentId, @RequestParam String type, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+  @GetMapping(value = "/{reviewId}")
+  public WritePageDTO getWritePage(@PathVariable String reviewId,
+                                   @RequestParam int tmdbId,
+                                   @RequestParam(defaultValue = "movie", required = false) String type,
+                                   @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
 
     LOGGER.info("GET WRITE PAGE.");
 
@@ -45,20 +49,29 @@ public class WritePageController {
       throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED ACCESS TOKEN");
     }
 
-    String path = type + "/" + contentId;
+    String path = type + "/" + tmdbId;
 
-    WriteContentObject writeContentObject = writePageService.getWritePage(path);
-
+    WriteContentObject writeContentObject = writePageService.getWriteContent(path);
     if (writeContentObject == null) {
-      LOGGER.error("ERROR OCCUR IN GETTING WRITE PAGE.");
+      LOGGER.error("ERROR OCCUR IN GETTING CONTENT DATA.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    return writeContentObject;
+    WriteReviewObject writeReviewObject = writePageService.getWriteReview(reviewId);
+    if (writeReviewObject == null) {
+      LOGGER.error("ERROR OCCUR IN GETTING REVIEW DATA.");
+      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    }
+
+    WritePageDTO writePageDTO = new WritePageDTO(writeContentObject, writeReviewObject);
+
+    return writePageDTO;
   }
 
-  @PostMapping(value = "")
-  public ResponseEntity writeReview(@RequestBody WritePageDTO writePageDTO, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException {
+  @PostMapping(value = "/{reviewId}")
+  public ResponseEntity writeReview(@PathVariable String reviewId,
+                                    @RequestBody WriteReviewDTO writeReviewDTO,
+                                    @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException {
 
     LOGGER.info("WRITE REVIEW.");
 
@@ -68,7 +81,11 @@ public class WritePageController {
       LOGGER.error("UNAUTHORIZED ACCESS TOKEN.");
       throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED ACCESS TOKEN");
     }
-    writePageService.writeReview((long) userId, writePageDTO);
+
+    if (!writePageService.writeReview(reviewId, (long) userId, writeReviewDTO)) {
+      LOGGER.error("ERROR OCCUR IN WRITING REVIEW.");
+      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    }
 
     return new ResponseEntity(HttpStatus.CREATED);
   }

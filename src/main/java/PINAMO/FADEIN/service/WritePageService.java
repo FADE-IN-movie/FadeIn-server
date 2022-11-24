@@ -1,14 +1,16 @@
 package PINAMO.FADEIN.service;
 
-import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
+import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
 import PINAMO.FADEIN.data.object.WriteContentObject;
+import PINAMO.FADEIN.data.object.WriteReviewObject;
 
 import java.util.Map;
 
 public interface WritePageService {
 
-  WriteContentObject getWritePage(String path);
+  WriteContentObject getWriteContent(String path);
+  WriteReviewObject getWriteReview(String reviewId);
 
-  Map<String, Long> writeReview(Long userId, WritePageDTO writePageDTO);
+  boolean writeReview(String reviewId, Long userId, WriteReviewDTO writeReviewDTO);
 
 }

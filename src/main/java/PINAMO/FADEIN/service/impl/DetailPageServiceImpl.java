@@ -226,27 +226,19 @@ public class DetailPageServiceImpl implements DetailPageService {
         String type = likeDTO.getType();
         String path = type + "/" + likeDTO.getTmdbId();
 
-        String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-        JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
 
-        int tmdbId = parser.getInt("id");
+        ContentEntity returnContentEntity = map.keySet().iterator().next();
+        ArrayList<String> genre = map.get(returnContentEntity);
 
-        String title;
-        if (type.equals("movie")) title = parser.getString("title");
-        else title = parser.getString("name");
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
 
-        String poster = movieUtil.posterTransducer(parser.get("poster_path"));
-        String overview = parser.getString("overview");
+        for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
 
-        ContentEntity contentEntity = contentDataHandler.saveContentEntity(new ContentEntity(tmdbId, type, title, poster,overview));
         UserEntity userEntity = userDataHandler.getUserEntity(userId);
         LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
 
-        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
-        for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
-
-        Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, tmdbId);
-
+        Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, contentEntity.getTmdbId());
         if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
       }
     }

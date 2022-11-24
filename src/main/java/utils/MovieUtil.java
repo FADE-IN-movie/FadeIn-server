@@ -1,5 +1,7 @@
 package utils;
 
+import PINAMO.FADEIN.data.Entity.ContentEntity;
+import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
 import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
 import PINAMO.FADEIN.data.object.ContentObject;
 import org.json.JSONArray;
@@ -103,15 +105,17 @@ public class MovieUtil {
   }
 
   public ArrayList<String> GenreTransducerByName(JSONArray genreList) {
-    ArrayList<String> returnGenre = new ArrayList<>();
+
+    JSONArray genreIds = new JSONArray();
 
     if (genreList.length() != 0) {
       for (int i = 0; i < genreList.length(); i++) {
         JSONObject genreObject = (JSONObject) genreList.get(i);
-        String genre = genreObject.getString("name");
-        returnGenre.add(genre);
+        int genreId = genreObject.getInt("id");
+        genreIds.put(genreId);
       }
     }
+    ArrayList<String> returnGenre = GenreTransducer(genreIds);
 
     return returnGenre;
   }
@@ -270,54 +274,6 @@ public class MovieUtil {
     else return usCertification;
   }
 
-//  public List<movieObject> getRecommendContent(String type){
-//
-//    int[] movie = {20342, 372058, 101299, 70160, 207703, 343668,5876, 122906, 198663, 294254, 807, 2832, 550 ,244786 ,155 ,603 ,157336 ,6977 ,165213 ,278, 49797, 423, 398978, 530385};
-//    int[] tv = {82237 ,67915 ,64840 ,117378 ,84327 ,70123 ,78648 ,80585 ,42009 ,86831 ,94796 ,97970 ,155226 ,20588 ,31505 ,90447 ,48462 ,112833 ,37722 ,1396 ,87739, 61459};
-//
-//    Random random = new Random();
-//
-//    Set<Integer> randomContentSet = new HashSet<>();
-//
-//    if (type.equals("movie")) {
-//      while (randomContentSet.size() < 10) {
-//        randomContentSet.add(movie[random.nextInt(movie.length)]);
-//      }
-//    }
-//    else {
-//      while (randomContentSet.size() < 10) {
-//        randomContentSet.add(tv[random.nextInt(tv.length)]);
-//      }
-//    }
-//
-//    ArrayList<Integer> randomContent = new ArrayList<>(randomContentSet);
-//
-//    List<movieObject> returnContents = new ArrayList<>();
-//
-//    for (int i=0; i<randomContent.size(); i++) {
-//
-//      String path = type + "/" + randomContent.get(i);
-//
-//      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-//      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
-//
-//      int id = parser.getInt("id");
-//
-//      String title;
-//      if (type.equals("movie")) title = parser.getString("title");
-//      else title = parser.getString("name");
-//
-//      ArrayList<String> genre = GenreTransducerByName(parser.getJSONArray("genres"));
-//      String poster = posterTransducer(parser.get("poster_path"));
-//      String overview = parser.getString("overview");
-//
-//      movieObject movieObject = new movieObject(id,type,title,genre,poster,overview);
-//
-//      returnContents.add(movieObject);
-//    }
-//    return returnContents;
-//  }
-
   public SearchLengthDTO getSearchLength(String keyword) {
 
     String query = "&query=" + keyword;
@@ -346,4 +302,40 @@ public class MovieUtil {
 
     return searchLengthDTO;
   }
+
+  public Map<ContentEntity,ArrayList<String>> getContentByEntity(String type, String path) {
+
+    String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    int tmdbId = parser.getInt("id");
+    String poster = posterTransducer(parser.get("poster_path"));
+    String overview = parser.getString("overview");
+    ArrayList<String> genre = GenreTransducerByName(parser.getJSONArray("genres"));
+
+    String title;
+    String originalTitle;
+    int runtime;
+
+    if (type.equals("movie")) {
+      title = parser.getString("title");
+      originalTitle = parser.getString("original_title");
+      runtime = parser.getInt("runtime");
+    }
+    else {
+      title = parser.getString("name");
+      originalTitle = parser.getString("original_name");
+      JSONArray runtimeArray = parser.getJSONArray("episode_run_time");
+      if (runtimeArray.length() != 0) runtime = Integer.parseInt(runtimeArray.get(0).toString());
+      else runtime = 0;
+    }
+
+    ContentEntity contentEntity = new ContentEntity(tmdbId, type, title, originalTitle, poster, runtime, overview);
+
+    Map<ContentEntity,ArrayList<String>> map = new HashMap<>();
+    map.put(contentEntity, genre);
+
+    return map;
+  }
+
 }

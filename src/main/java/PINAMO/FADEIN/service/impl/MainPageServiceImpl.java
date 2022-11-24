@@ -148,17 +148,13 @@ public class MainPageServiceImpl implements MainPageService {
 
         String path = "movie" + "/" + movie[i];
 
-        String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-        JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
 
-        int tmdbId = parser.getInt("id");
-        String title = parser.getString("title");
-        String poster = movieUtil.posterTransducer(parser.get("poster_path"));
-        String overview = parser.getString("overview");
+        ContentEntity returnContentEntity = map.keySet().iterator().next();
+        ArrayList<String> genre = map.get(returnContentEntity);
 
-        ContentEntity contentEntity = contentDataHandler.saveContentEntity(new ContentEntity(tmdbId, type, title, poster, overview));
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
 
-        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
         for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
       }
     }
@@ -166,17 +162,13 @@ public class MainPageServiceImpl implements MainPageService {
       for (int i = 0; i < tv.length; i++) {
         String path = "tv" + "/" + tv[i];
 
-        String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-        JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
 
-        int tmdbId = parser.getInt("id");
-        String title = parser.getString("name");
-        String poster = movieUtil.posterTransducer(parser.get("poster_path"));
-        String overview = parser.getString("overview");
+        ContentEntity returnContentEntity = map.keySet().iterator().next();
+        ArrayList<String> genre = map.get(returnContentEntity);
 
-        ContentEntity contentEntity = contentDataHandler.saveContentEntity(new ContentEntity(tmdbId, type, title, poster, overview));
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
 
-        ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
         for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
       }
     }

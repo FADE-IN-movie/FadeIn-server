@@ -34,19 +34,18 @@ public class MainPageController {
   }
 
   @PostMapping(value = "/save")
-  public void saveRecommend(@RequestBody String type) {
+  public void saveRecommend(@RequestParam(defaultValue = "movie", required = false) String type) {
     mainPageService.saveRecommend(type);
   }
 
   @GetMapping(value = "")
-  public MainPageDTO getMainPage(@RequestParam String type, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+  public MainPageDTO getMainPage(@RequestParam(defaultValue = "movie", required = false) String type,
+                                 @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+
+    LOGGER.info("GET "+ type.toUpperCase() + " CONTENTS.");
 
     int userId = 0;
     if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
-
-    System.out.println(userId);
-
-    LOGGER.info("GET "+ type.toUpperCase() + " CONTENTS.");
 
     List<ContentObject> popular = mainPageService.getPopular(type);
     if (popular == null) {

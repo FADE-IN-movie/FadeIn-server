@@ -1,10 +1,12 @@
 package PINAMO.FADEIN.service.impl;
 
 import PINAMO.FADEIN.data.Entity.ContentEntity;
+import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
 import PINAMO.FADEIN.data.Entity.ReviewEntity;
 import PINAMO.FADEIN.data.Entity.UserEntity;
-import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
+import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
 import PINAMO.FADEIN.data.object.WriteContentObject;
+import PINAMO.FADEIN.data.object.WriteReviewObject;
 import PINAMO.FADEIN.handler.*;
 import PINAMO.FADEIN.service.WritePageService;
 import org.json.JSONObject;
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Service;
 import utils.MovieUtil;
 import utils.RestTemplateUtil;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Map;
 
 @Service
@@ -36,7 +38,7 @@ public class WritePageServiceImpl implements WritePageService {
   }
 
   @Override
-  public WriteContentObject getWritePage(String path) {
+  public WriteContentObject getWriteContent(String path) {
     try {
       String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
       JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
@@ -65,41 +67,64 @@ public class WritePageServiceImpl implements WritePageService {
   }
 
   @Override
-  public Map<String, Long> writeReview(Long userId, WritePageDTO writePageDTO) {
-//    try {
-      String type = writePageDTO.getType();
+  public WriteReviewObject getWriteReview(String reviewId) {
+    try {
+      WriteReviewObject writeReviewObject;
+      ReviewEntity reviewEntity;
 
-      Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(writePageDTO.getContentId(), type);
-      ContentEntity contentEntity;
-      if (isContent) {
-        contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(writePageDTO.getContentId(), type);
+      if (reviewDataHandler.isReviewEntity(reviewId)) {
+        reviewEntity = reviewDataHandler.getReviewEntity(reviewId);
+        String watched_at = reviewEntity.getWatched_date() +  "T" + reviewEntity.getWatched_time();
+        writeReviewObject = new WriteReviewObject(reviewId, watched_at, reviewEntity.getWatched_in(), reviewEntity.getWatched_with(), reviewEntity.getRating(), reviewEntity.getMemo(), reviewEntity.getComment());
+      } else {
+        writeReviewObject = new WriteReviewObject("", "", "", "", 0, "", "");
       }
-      else {
-        String path = type + "/" + writePageDTO.getContentId();
 
-        String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-        JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+      return writeReviewObject;
+    }
+    catch (Exception e) {
+      return null;
+    }
+  }
 
-        int tmdbId = parser.getInt("id");
+  @Override
+  public boolean writeReview(String reviewId, Long userId, WriteReviewDTO writeReviewDTO) {
+      try {
+        String type = writeReviewDTO.getType();
 
-        String title;
-        if (type.equals("movie")) title = parser.getString("title");
-        else title = parser.getString("name");
+        Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(writeReviewDTO.getContentId(), type);
+        ContentEntity contentEntity;
+        if (isContent) {
+          contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(writeReviewDTO.getContentId(), type);
+        }
+        else {
+          String path = type + "/" + writeReviewDTO.getContentId();
 
-        String poster = movieUtil.posterTransducer(parser.get("poster_path"));
-        String overview = parser.getString("overview");
+          Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
 
-        contentEntity = contentDataHandler.saveContentEntity(new ContentEntity(tmdbId, type, title, poster,overview));
+          ContentEntity returnContentEntity = map.keySet().iterator().next();
+          ArrayList<String> genre = map.get(returnContentEntity);
+
+          contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
+
+          for (int j = 0; j < genre.size(); j++)
+            contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
+        }
+        String watched_date = writeReviewDTO.getWatchedAt().split("T")[0];
+        String watched_time = writeReviewDTO.getWatchedAt().split("T")[1];
+
+        UserEntity userEntity = userDataHandler.getUserEntity(userId);
+
+        if (reviewDataHandler.isReviewEntity(reviewId)) {
+          reviewDataHandler.updateReviewEntity(reviewId, watched_date, watched_time, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment());
+        }
+        else {
+          reviewDataHandler.saveReviewEntity(new ReviewEntity(userEntity, contentEntity, watched_date, watched_time, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment()));
+        }
+        return true;
       }
-      UserEntity userEntity = userDataHandler.getUserEntity(userId);
-      ReviewEntity reviewEntity = reviewDataHandler.saveReviewEntity(new ReviewEntity(userEntity, contentEntity, writePageDTO.getWatchedAt(), writePageDTO.getWatchedIn(), writePageDTO.getWatchedWith(), writePageDTO.getRating(), writePageDTO.getMemo(), writePageDTO.getComment()));
-      Map<String, Long> map = new HashMap<>();
-      map.put("reviewId", reviewEntity.getId());
-      return map;
-//    }
-//    catch (Exception e) {
-//      return null;
-//    }
-
+      catch (Exception e){
+        return false;
+      }
   }
 }
