@@ -11,4 +11,6 @@ public interface ContentGenreDAO {
   ContentGenreEntity saveContentGenre(ContentGenreEntity contentGenreEntity);
 
   ArrayList<ContentGenreEntity> getContentGenresByContentId(Long contentId);
+
+  String getPreferenceGenreByUserId(Long userId);
 }

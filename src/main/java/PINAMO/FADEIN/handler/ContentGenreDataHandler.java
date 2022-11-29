@@ -11,4 +11,6 @@ public interface ContentGenreDataHandler {
   ContentGenreEntity saveContentGenreEntity(ContentGenreEntity contentGenreEntity);
 
   ArrayList<ContentGenreEntity> getContentGenreEntitiesByContentId(Long contentId);
+
+  String getReferenceGenreByUserId(Long userId);
 }

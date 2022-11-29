@@ -14,7 +14,6 @@ import javax.persistence.*;
 public class ReviewEntity {
 
   @Id
-  @GeneratedValue
   private String id;
   @ManyToOne
   @JoinColumn(name ="userId", referencedColumnName = "id")
@@ -23,11 +22,11 @@ public class ReviewEntity {
   @JoinColumn(name ="contentId", referencedColumnName = "id")
   private ContentEntity contentEntity;
   @Column(columnDefinition = "DATE")
-  private String watched_date;
+  private String watchedDate;
   @Column(columnDefinition = "TIME")
-  private String watched_time;
-  private String watched_in;
-  private String watched_with;
+  private String watchedTime;
+  private String watchedIn;
+  private String watchedWith;
   @Column(columnDefinition = "DECIMAL(3,1) NOT NULL")
   private float rating;
   @Column(columnDefinition = "TEXT")
@@ -35,13 +34,13 @@ public class ReviewEntity {
   @Column(columnDefinition = "TEXT")
   private String comment;
 
-  public ReviewEntity(UserEntity userEntity, ContentEntity contentEntity, String watched_date, String watched_time, String watched_in, String watched_with, float rating, String memo, String comment) {
+  public ReviewEntity(UserEntity userEntity, ContentEntity contentEntity, String watchedDate, String watchedTime, String watchedIn, String watchedWith, float rating, String memo, String comment) {
     this.userEntity = userEntity;
     this.contentEntity = contentEntity;
-    this.watched_date = watched_date;
-    this.watched_time = watched_time;
-    this.watched_in = watched_in;
-    this.watched_with = watched_with;
+    this.watchedDate = watchedDate;
+    this.watchedTime = watchedTime;
+    this.watchedIn = watchedIn;
+    this.watchedWith = watchedWith;
     this.rating = rating;
     this.memo = memo;
     this.comment = comment;

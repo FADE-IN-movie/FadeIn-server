@@ -4,6 +4,7 @@ import PINAMO.FADEIN.data.Entity.ContentEntity;
 import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
 import PINAMO.FADEIN.data.Entity.LikeEntity;
 import PINAMO.FADEIN.data.Entity.UserEntity;
+import PINAMO.FADEIN.data.dto.movie.RankingPageDTO;
 import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
 import PINAMO.FADEIN.handler.ContentDataHandler;
@@ -13,6 +14,7 @@ import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.MainPageService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import utils.MovieUtil;
 import utils.RestTemplateUtil;
@@ -82,16 +84,14 @@ public class MainPageServiceImpl implements MainPageService {
   @Override
   public List<ContentObject> getPreference(Long userId, String type) {
     try {
-//      List<ContentObject> result;
-//      if (userDataHandler.isUserEntity(userId)){
-//        List<LikeEntity> likeEntities = likeDataHandler.getLikeEntitiesByUserId(userId);
-//
-//        for (int i=0; i<)
-//        ContentEntity contentEntity = contentDataHandler.getContentEntity()
-//
-//        result = movieUtil.getMovies(type, "discover", 1, "")
-//      }
-      return null;
+
+      String genre = contentGenreDataHandler.getReferenceGenreByUserId(userId);
+
+      String genreId;
+      if (genre==null) genreId = movieUtil.getRandomGenre(type);
+      else genreId = movieUtil.GenreReverseTransducer(genre);
+
+      return movieUtil.getMovies(type, "discover", 1, "&vote_count.gte=300" + "&sort_by=popularity.desc" + "&with_genres=" + genreId);
     }
     catch (Exception e) {
       return null;

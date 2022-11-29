@@ -65,17 +65,17 @@ public class MainPageController {
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    List<ContentObject> preference = mainPageService.getPopular(type);
+    List<ContentObject> preference = mainPageService.getPreference((long) userId, type);
     if (preference == null) {
       LOGGER.error("ERROR OCCUR IN GETTING PREFERENCE CONTENTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
     List<ContentObject> recommend = mainPageService.getRecommend(type);
-//    if (recommend == null) {
-//      LOGGER.error("ERROR OCCUR IN GETTING RECOMMEND CONTENTS.");
-//      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
-//    }
+    if (recommend == null) {
+      LOGGER.error("ERROR OCCUR IN GETTING RECOMMEND CONTENTS.");
+      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    }
 
     return mainPageService.getMainPage(popular, topRate, nowPlaying, preference, recommend);
   }

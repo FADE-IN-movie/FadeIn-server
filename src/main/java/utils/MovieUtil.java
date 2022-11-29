@@ -104,6 +104,97 @@ public class MovieUtil {
     return returnArrayList;
   }
 
+  public String GenreReverseTransducer(String genre){
+
+    String returnGenre = new String();
+
+      switch (genre) {
+        case "액션":
+          returnGenre = "28";
+          break;
+        case "모험":
+          returnGenre =  "12";
+          break;
+        case "애니메이션":
+          returnGenre =  "16";
+          break;
+        case "코미디":
+          returnGenre =  "35";
+          break;
+        case "범죄":
+          returnGenre =  "80";
+          break;
+        case "다큐멘터리":
+          returnGenre =  "99";
+          break;
+        case "드라마":
+          returnGenre =  "18";
+          break;
+        case "가족":
+          returnGenre =  "10751";
+          break;
+        case "판타지":
+          returnGenre =  "14";
+          break;
+        case "역사":
+          returnGenre =  "36";
+          break;
+        case "공포":
+          returnGenre =  "27";
+          break;
+        case "음악":
+          returnGenre =  "10402";
+          break;
+        case "미스터리":
+          returnGenre =  "9648";
+          break;
+        case "로맨스":
+          returnGenre =  "10749";
+          break;
+        case "SF":
+          returnGenre =  "878";
+          break;
+        case "TV영화":
+          returnGenre =  "10770";
+          break;
+        case "스릴러":
+          returnGenre =  "53";
+          break;
+        case "전쟁":
+          returnGenre =  "10752";
+          break;
+        case "서부":
+          returnGenre =  "37";
+          break;
+        case "액션&모험":
+          returnGenre =  "10759";
+          break;
+        case "키즈":
+          returnGenre =  "10762";
+          break;
+        case "뉴스":
+          returnGenre =  "10763";
+          break;
+        case "리얼리티":
+          returnGenre =  "10764";
+          break;
+        case "SF판타지":
+          returnGenre =  "10765";
+          break;
+        case "연속극":
+          returnGenre =  "10766";
+          break;
+        case "토크":
+          returnGenre =  "10767";
+          break;
+        case "전쟁&정치":
+          returnGenre =  "10768";
+          break;
+      }
+
+      return returnGenre;
+  }
+
   public ArrayList<String> GenreTransducerByName(JSONArray genreList) {
 
     JSONArray genreIds = new JSONArray();
@@ -178,7 +269,7 @@ public class MovieUtil {
     else path = type + "/" + menu;
 
     String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko%s&page=%d", path, query, page);
-    System.out.println(requestURL);
+
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
     JSONArray arrayList = parser.getJSONArray("results");
@@ -306,6 +397,7 @@ public class MovieUtil {
   public Map<ContentEntity,ArrayList<String>> getContentByEntity(String type, String path) {
 
     String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
+
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
     int tmdbId = parser.getInt("id");
@@ -336,6 +428,19 @@ public class MovieUtil {
     map.put(contentEntity, genre);
 
     return map;
+  }
+
+  public String getRandomGenre(String type) {
+    String requestURL = String.format("https://api.themoviedb.org/3/genre/%s/list?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=en-US", type);
+    JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+
+    ArrayList<String> genre = GenreTransducerByName(parser.getJSONArray("genres"));
+
+    Random random = new Random();
+
+    String genreId = GenreReverseTransducer(genre.get(random.nextInt(genre.size())));
+
+    return genreId;
   }
 
 }

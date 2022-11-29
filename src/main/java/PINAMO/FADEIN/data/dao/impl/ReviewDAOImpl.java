@@ -27,6 +27,11 @@ public class ReviewDAOImpl implements ReviewDAO {
     }
 
     @Override
+    public boolean isReviewByUserId(Long userId) {
+        return reviewRepository.existsByUserEntity_Id(userId);
+    }
+
+    @Override
     public ReviewEntity getReview(String reviewId) {
         return reviewRepository.getReferenceById(reviewId);
     }
@@ -37,8 +42,18 @@ public class ReviewDAOImpl implements ReviewDAO {
     }
 
     @Override
+    public List<ReviewEntity> getReviewsByUserId(Long userId) {
+        return reviewRepository.findAllByUserEntity_Id(userId);
+    }
+
+    @Override
     public ReviewEntity saveReview(ReviewEntity reviewEntity) {
         return reviewRepository.save(reviewEntity);
+    }
+
+    @Override
+    public void deleteReview(String reviewId) {
+        reviewRepository.deleteById(reviewId);
     }
 
     @Override

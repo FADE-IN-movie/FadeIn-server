@@ -71,13 +71,13 @@ public class WritePageServiceImpl implements WritePageService {
     try {
       WriteReviewObject writeReviewObject;
       ReviewEntity reviewEntity;
-
+      System.out.println(reviewId);
       if (reviewDataHandler.isReviewEntity(reviewId)) {
         reviewEntity = reviewDataHandler.getReviewEntity(reviewId);
-        String watched_at = reviewEntity.getWatched_date() +  "T" + reviewEntity.getWatched_time();
-        writeReviewObject = new WriteReviewObject(reviewId, watched_at, reviewEntity.getWatched_in(), reviewEntity.getWatched_with(), reviewEntity.getRating(), reviewEntity.getMemo(), reviewEntity.getComment());
+        String watchedAt = reviewEntity.getWatchedDate() +  "T" + reviewEntity.getWatchedTime();
+        writeReviewObject = new WriteReviewObject(reviewId, watchedAt, reviewEntity.getWatchedIn(), reviewEntity.getWatchedWith(), reviewEntity.getRating(), reviewEntity.getMemo(), reviewEntity.getComment());
       } else {
-        writeReviewObject = new WriteReviewObject("", "", "", "", 0, "", "");
+        writeReviewObject = new WriteReviewObject("", "", "", "", (float) 0.0, "", "");
       }
 
       return writeReviewObject;
@@ -92,13 +92,13 @@ public class WritePageServiceImpl implements WritePageService {
       try {
         String type = writeReviewDTO.getType();
 
-        Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(writeReviewDTO.getContentId(), type);
+        Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(writeReviewDTO.getTmdbId(), type);
         ContentEntity contentEntity;
         if (isContent) {
-          contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(writeReviewDTO.getContentId(), type);
+          contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(writeReviewDTO.getTmdbId(), type);
         }
         else {
-          String path = type + "/" + writeReviewDTO.getContentId();
+          String path = type + "/" + writeReviewDTO.getTmdbId();
 
           Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
 
@@ -119,7 +119,7 @@ public class WritePageServiceImpl implements WritePageService {
           reviewDataHandler.updateReviewEntity(reviewId, watched_date, watched_time, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment());
         }
         else {
-          reviewDataHandler.saveReviewEntity(new ReviewEntity(userEntity, contentEntity, watched_date, watched_time, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment()));
+          reviewDataHandler.saveReviewEntity(new ReviewEntity(reviewId, userEntity, contentEntity, watched_date, watched_time, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment()));
         }
         return true;
       }

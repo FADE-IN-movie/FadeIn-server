@@ -37,15 +37,19 @@ public class DetailPageController {
     this.detailPageService = detailPageService;
   }
 
-  @GetMapping(value = "/{contentId}")
-  public DetailPageDTO getDetailPage(@PathVariable int contentId, @RequestParam(defaultValue = "movie", required = false) String type, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+  @GetMapping(value = "/{tmdbId}")
+  public DetailPageDTO getDetailPage(@PathVariable int tmdbId,
+                                     @RequestParam(defaultValue = "movie", required = false) String type,
+                                     @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
+
+    System.out.println(accessToken);
 
     LOGGER.info("GET CONTENT DETAIL.");
 
     int userId = 0;
     if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
 
-    String path = type + "/" + contentId;
+    String path = type + "/" + tmdbId;
 
     DetailObject detail = detailPageService.getDetail(path);
     if (detail == null) {

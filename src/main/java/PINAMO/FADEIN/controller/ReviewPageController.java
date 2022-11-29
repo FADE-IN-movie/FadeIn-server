@@ -1,9 +1,12 @@
 package PINAMO.FADEIN.controller;
 
+import PINAMO.FADEIN.data.dto.movie.ReviewPageDTO;
+import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
 import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
 import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
 import PINAMO.FADEIN.data.object.WriteContentObject;
 import PINAMO.FADEIN.data.object.WriteReviewObject;
+import PINAMO.FADEIN.service.ReviewPageService;
 import PINAMO.FADEIN.service.WritePageService;
 import exception.Constants;
 import exception.CustomException;
@@ -16,31 +19,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utils.JwtUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/reviews")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-public class WritePageController {
+public class ReviewPageController {
 
-  private WritePageService writePageService;
-  private final Logger LOGGER = LoggerFactory.getLogger(WritePageController.class);
+  private ReviewPageService reviewPageService;
+  private final Logger LOGGER = LoggerFactory.getLogger(ReviewPageController.class);
 
   JwtUtil jwtUtil = new JwtUtil();
 
   @Autowired
-  public WritePageController(WritePageService writePageService) {
-    this.writePageService = writePageService;
+  public ReviewPageController(ReviewPageService reviewPageService) {
+    this.reviewPageService = reviewPageService;
   }
 
-  @GetMapping(value = "")
-  public WritePageDTO getWritePage(@RequestParam(required = false) String reviewId,
-                                   @RequestParam int tmdbId,
-                                   @RequestParam(defaultValue = "movie", required = false) String type,
-                                   @RequestHeader(value = "authorization") String accessToken) throws CustomException{
+  @GetMapping(value = "/list")
+  public ReviewPageDTO getReviewPage(@RequestHeader(value = "authorization") String accessToken) throws CustomException{
 
-    LOGGER.info("GET WRITE PAGE.");
+    LOGGER.info("GET REVIEW PAGE.");
 
     int userId = 0;
     if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
@@ -49,32 +50,20 @@ public class WritePageController {
       throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED ACCESS TOKEN");
     }
 
-    String path = type + "/" + tmdbId;
-
-    WriteContentObject writeContentObject = writePageService.getWriteContent(path);
-    if (writeContentObject == null) {
-      LOGGER.error("ERROR OCCUR IN GETTING CONTENT DATA.");
-      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
-    }
-
-    if (reviewId==null) reviewId = "";
-    WriteReviewObject writeReviewObject = writePageService.getWriteReview(reviewId);
-    if (writeReviewObject == null) {
-      LOGGER.error("ERROR OCCUR IN GETTING REVIEW DATA.");
+    ReviewPageDTO reviewPageDTO = reviewPageService.getReviewPage((long) userId);
+    if (reviewPageDTO == null) {
+      LOGGER.error("ERROR OCCUR IN GETTING REVIEW LIST.");
       throw new CustomException(Constants.ExceptionClass.REVIEW, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    WritePageDTO writePageDTO = new WritePageDTO(writeContentObject, writeReviewObject);
-
-    return writePageDTO;
+    return reviewPageDTO;
   }
 
-  @PostMapping(value = "/{reviewId}")
+  @DeleteMapping(value = "/{reviewId}")
   public ResponseEntity writeReview(@PathVariable String reviewId,
-                                    @RequestBody WriteReviewDTO writeReviewDTO,
                                     @RequestHeader(value = "authorization") String accessToken) throws CustomException {
 
-    LOGGER.info("WRITE REVIEW.");
+    LOGGER.info("DELETE REVIEW.");
 
     int userId = 0;
     if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
@@ -83,14 +72,18 @@ public class WritePageController {
       throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED ACCESS TOKEN");
     }
 
-    if (!writePageService.writeReview(reviewId, (long) userId, writeReviewDTO)) {
+    int returnCode = reviewPageService.deleteReview(reviewId);
+
+    if (returnCode == 0) {
       LOGGER.error("ERROR OCCUR IN WRITING REVIEW.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    } else if (returnCode == 2) {
+      LOGGER.error("NOT EXIST REVIEW.");
+      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.BAD_REQUEST, "NOT EXIST REVIEW");
     }
 
-    return new ResponseEntity(HttpStatus.CREATED);
+    return new ResponseEntity(HttpStatus.OK);
   }
-
 
   @ExceptionHandler(value = CustomException.class)
   public ResponseEntity<Map<String, String>> ExceptionHandler(CustomException e) {

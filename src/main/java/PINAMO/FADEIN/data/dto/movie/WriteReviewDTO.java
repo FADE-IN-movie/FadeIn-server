@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class WriteReviewDTO {
 
-  private int contentId;
+  private int tmdbId;
   private String type;
   private String watchedAt;
   private String watchedIn;

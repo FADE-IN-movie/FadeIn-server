@@ -6,14 +6,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface ReviewRepository extends JpaRepository<ReviewEntity, String> {
 
   boolean existsById(String reviewId);
+  boolean existsByUserEntity_Id(Long userId);
 
   ReviewEntity findByUserEntity_IdAndContentEntity_Id(Long userId, Long contentId);
 
+  List<ReviewEntity> findAllByUserEntity_Id(Long userId);
+
+  void deleteById(String reviewId);
+
   @Modifying(clearAutomatically = true)
-  @Query("UPDATE ReviewEntity r SET r.watched_date = :watched_date, r.watched_time = :watched_time, r.watched_in = :watched_in, r.watched_with = :watched_with, r.rating = :rating, r.memo = :memo, r.comment = :comment WHERE r.id = :reviewId")
-  int updateReview(String reviewId, String watched_date, String watched_time, String watched_in, String watched_with, float rating, String memo, String comment);
+  @Query("UPDATE ReviewEntity r SET r.watchedDate = :watchedDate, r.watchedTime = :watchedTime, r.watchedIn = :watchedIn, r.watchedWith = :watchedWith, r.rating = :rating, r.memo = :memo, r.comment = :comment WHERE r.id = :reviewId")
+  int updateReview(String reviewId, String watchedDate, String watchedTime, String watchedIn, String watchedWith, float rating, String memo, String comment);
 
 }

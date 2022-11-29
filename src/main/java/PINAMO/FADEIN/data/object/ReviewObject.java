@@ -7,10 +7,17 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class WriteReviewObject {
+public class ReviewObject {
 
   private String reviewId;
-  private String watchedAt;
+  private int tmdbId;
+  private String title;
+  private String originalTitle;
+  private String type;
+  private String poster;
+  private int runtime;
+  private String watchedDate;
+  private String watchedTime;
   private String watchedIn;
   private String watchedWith;
   private float rating;

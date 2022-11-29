@@ -29,6 +29,11 @@ public class ReviewDataHandlerImpl implements ReviewDataHandler {
   }
 
   @Override
+  public boolean isReviewEntityByUserId(Long userId) {
+    return reviewDAO.isReviewByUserId(userId);
+  }
+
+  @Override
   public ReviewEntity getReviewEntity(String reviewId) {
     return reviewDAO.getReview(reviewId);
   }
@@ -39,8 +44,18 @@ public class ReviewDataHandlerImpl implements ReviewDataHandler {
   }
 
   @Override
+  public List<ReviewEntity> getReviewEntitiesByUserId(Long userId) {
+    return reviewDAO.getReviewsByUserId(userId);
+  }
+
+  @Override
   public ReviewEntity saveReviewEntity(ReviewEntity reviewEntity) {
     return reviewDAO.saveReview(reviewEntity);
+  }
+
+  @Override
+  public void deleteReviewEntity(String reviewId) {
+    reviewDAO.deleteReview(reviewId);
   }
 
   @Override

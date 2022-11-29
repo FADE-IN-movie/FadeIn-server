@@ -33,4 +33,9 @@ public class ContentGenreDAOImpl implements ContentGenreDAO {
     public ArrayList<ContentGenreEntity> getContentGenresByContentId(Long contentId) {
         return contentGenreRepository.findAllByContentEntity_Id(contentId);
     }
+
+    @Override
+    public String getPreferenceGenreByUserId(Long userId) {
+        return contentGenreRepository.getPreferenceGenre(userId);
+    }
 }

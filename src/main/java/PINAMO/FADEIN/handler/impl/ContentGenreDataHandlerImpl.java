@@ -35,4 +35,9 @@ public class ContentGenreDataHandlerImpl implements ContentGenreDataHandler {
     return contentGenreDAO.getContentGenresByContentId(contentId);
   }
 
+  @Override
+  public String getReferenceGenreByUserId(Long userId) {
+    return contentGenreDAO.getPreferenceGenreByUserId(userId);
+  }
+
 }

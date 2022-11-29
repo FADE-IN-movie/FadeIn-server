@@ -3,7 +3,7 @@ package exception;
 public class Constants {
 
   public enum ExceptionClass {
-    PRODUCT("Product"), USER("User"), CONTENT("Content");
+    USER("User"), CONTENT("Content"), REVIEW("Review");
 
     private String exceptionClass;
 
