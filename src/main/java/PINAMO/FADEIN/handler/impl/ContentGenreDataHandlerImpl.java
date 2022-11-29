@@ -36,8 +36,8 @@ public class ContentGenreDataHandlerImpl implements ContentGenreDataHandler {
   }
 
   @Override
-  public String getReferenceGenreByUserId(Long userId) {
-    return contentGenreDAO.getPreferenceGenreByUserId(userId);
+  public String getReferenceGenreByUserId(Long userId, String type) {
+    return contentGenreDAO.getPreferenceGenreByUserId(userId, type);
   }
 
 }

@@ -85,13 +85,32 @@ public class MainPageServiceImpl implements MainPageService {
   public List<ContentObject> getPreference(Long userId, String type) {
     try {
 
-      String genre = contentGenreDataHandler.getReferenceGenreByUserId(userId);
+      String genre = contentGenreDataHandler.getReferenceGenreByUserId(userId, type);
 
       String genreId;
       if (genre==null) genreId = movieUtil.getRandomGenre(type);
       else genreId = movieUtil.GenreReverseTransducer(genre);
 
-      return movieUtil.getMovies(type, "discover", 1, "&vote_count.gte=300" + "&sort_by=popularity.desc" + "&with_genres=" + genreId);
+      Random random = new Random();
+      int randomNum = random.nextInt(4);
+
+      String sortBy = new String();
+      switch (randomNum){
+        case 0:
+          sortBy = "&sort_by=vote_average.desc";
+          break;
+        case 1:
+          sortBy = "&sort_by=vote_count.desc";
+          break;
+        case 2:
+          sortBy = "&sort_by=popularity.desc";
+          break;
+        case 3:
+          sortBy = "&sort_by=revenue.desc";
+          break;
+      }
+
+      return movieUtil.getMovies(type, "discover", 1, "&vote_count.gte=300" + sortBy + "&with_genres=" + genreId);
     }
     catch (Exception e) {
       return null;

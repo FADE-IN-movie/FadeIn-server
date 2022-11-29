@@ -19,12 +19,12 @@ public interface ContentGenreRepository extends JpaRepository<ContentGenreEntity
           "WHERE content_id IN (" +
             "SELECT id " +
             "FROM contents " +
-            "WHERE id IN (" +
+            "WHERE contents.type = :c_type AND id IN (" +
               "SELECT content_id " +
               "FROM likes " +
               "WHERE user_id IN (" +
                 "SELECT id " +
                 "FROM users " +
                 "WHERE id = :user_id))) GROUP BY genre ORDER BY COUNT(*) desc LIMIT 1;", nativeQuery = true)
-  String getPreferenceGenre(@Param("user_id") Long userId);
+  String getPreferenceGenre(@Param("user_id") Long userId, @Param("c_type") String type);
 }
