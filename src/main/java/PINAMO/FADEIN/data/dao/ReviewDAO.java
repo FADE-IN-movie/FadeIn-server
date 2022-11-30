@@ -14,6 +14,7 @@ public interface ReviewDAO {
   ReviewEntity getReviewByUserIdAndContentId(Long userId, Long contentId);
 
   List<ReviewEntity> getReviewsByUserId(Long userId);
+  List<ReviewEntity> getReviewsByUserIdAndDate(Long userId, String start, String end);
 
   ReviewEntity saveReview(ReviewEntity reviewEntity);
 

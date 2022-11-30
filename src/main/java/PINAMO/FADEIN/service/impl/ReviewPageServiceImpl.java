@@ -42,12 +42,12 @@ public class ReviewPageServiceImpl implements ReviewPageService {
   }
 
   @Override
-  public ReviewPageDTO getReviewPage(Long userId) {
+  public ReviewPageDTO getReviewPage(Long userId, int year, int month) {
 
     List<ReviewObject> returnReviews = new ArrayList<>();
 
     if (reviewDataHandler.isReviewEntityByUserId(userId)) {
-      List<ReviewEntity> reviewEntities = reviewDataHandler.getReviewEntitiesByUserId(userId);
+      List<ReviewEntity> reviewEntities = reviewDataHandler.getReviewEntitiesByUserIdAndDate(userId, year, month);
       for (int i=0; i<reviewEntities.size(); i++) {
         ReviewEntity reviewEntity = reviewEntities.get(i);
 

@@ -21,6 +21,8 @@ public class UserUtil {
 
     LoginDTO loginDTO = new LoginDTO(userEntity.getId(), userEntity.getUserEmail(), userEntity.getUserName(), userEntity.getUserImg(), returnAccessToken, returnAccessTokenExp, returnRefreshToken, returnRefreshTokenExp);
 
+    System.out.println(returnAccessToken);
+
     return loginDTO;
   }
 

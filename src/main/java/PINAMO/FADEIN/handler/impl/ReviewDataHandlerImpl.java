@@ -6,6 +6,7 @@ import PINAMO.FADEIN.data.dao.LikeDAO;
 import PINAMO.FADEIN.data.dao.ReviewDAO;
 import PINAMO.FADEIN.handler.LikeDataHandler;
 import PINAMO.FADEIN.handler.ReviewDataHandler;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,14 @@ public class ReviewDataHandlerImpl implements ReviewDataHandler {
   @Override
   public List<ReviewEntity> getReviewEntitiesByUserId(Long userId) {
     return reviewDAO.getReviewsByUserId(userId);
+  }
+
+  @Override
+  public List<ReviewEntity> getReviewEntitiesByUserIdAndDate(Long userId, int year, int month) {
+    String start = Integer.toString(year) + "-" + Integer.toString(month) + "-" + "01";
+    String end = Integer.toString(year) + "-" + Integer.toString(month) + "-" + "31";
+
+    return reviewDAO.getReviewsByUserIdAndDate(userId, start, end);
   }
 
   @Override

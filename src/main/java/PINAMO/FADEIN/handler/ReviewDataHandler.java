@@ -14,6 +14,7 @@ public interface ReviewDataHandler {
   ReviewEntity getReviewEntityByUserIdAndContentId(Long userId, Long contentId);
 
   List<ReviewEntity> getReviewEntitiesByUserId(Long userId);
+  List<ReviewEntity> getReviewEntitiesByUserIdAndDate(Long userId, int year, int month);
 
   ReviewEntity saveReviewEntity(ReviewEntity reviewEntity);
 

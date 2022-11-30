@@ -1,7 +1,9 @@
 package PINAMO.FADEIN.controller;
 
+import PINAMO.FADEIN.data.dto.movie.SearchPageDTO;
 import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
 import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
+import PINAMO.FADEIN.data.dto.movie.WriteSearchDTO;
 import PINAMO.FADEIN.data.object.WriteContentObject;
 import PINAMO.FADEIN.data.object.WriteReviewObject;
 import PINAMO.FADEIN.service.WritePageService;
@@ -91,6 +93,20 @@ public class WritePageController {
     return new ResponseEntity(HttpStatus.CREATED);
   }
 
+  @GetMapping(value = "/search")
+  public WriteSearchDTO getSearchPage(@RequestParam String keyword,
+                                      @RequestParam(defaultValue = "1", required = false) int page) throws CustomException {
+
+    LOGGER.info("GET SEARCH RESULTS IN WRITE PAGE.");
+
+    WriteSearchDTO writeSearchDTO = writePageService.getWriteSearch(keyword, page);
+    if (writeSearchDTO == null) {
+      LOGGER.error("ERROR OCCUR IN GETTING SEARCH RESULTS.");
+      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    }
+
+    return writeSearchDTO;
+  }
 
   @ExceptionHandler(value = CustomException.class)
   public ResponseEntity<Map<String, String>> ExceptionHandler(CustomException e) {

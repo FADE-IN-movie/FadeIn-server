@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import utils.JwtUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,13 +34,21 @@ public class ReviewPageController {
 
   JwtUtil jwtUtil = new JwtUtil();
 
+
+  public int getYear() {
+    Date now = new Date();
+    return Integer.parseInt(now.toString().split("-")[0]);
+  }
+
   @Autowired
   public ReviewPageController(ReviewPageService reviewPageService) {
     this.reviewPageService = reviewPageService;
   }
 
   @GetMapping(value = "/list")
-  public ReviewPageDTO getReviewPage(@RequestHeader(value = "authorization") String accessToken) throws CustomException{
+  public ReviewPageDTO getReviewPage(@RequestParam Integer year,
+                                     @RequestParam Integer month,
+                                     @RequestHeader(value = "authorization") String accessToken) throws CustomException{
 
     LOGGER.info("GET REVIEW PAGE.");
 
@@ -50,7 +59,7 @@ public class ReviewPageController {
       throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED ACCESS TOKEN");
     }
 
-    ReviewPageDTO reviewPageDTO = reviewPageService.getReviewPage((long) userId);
+    ReviewPageDTO reviewPageDTO = reviewPageService.getReviewPage((long) userId, year, month);
     if (reviewPageDTO == null) {
       LOGGER.error("ERROR OCCUR IN GETTING REVIEW LIST.");
       throw new CustomException(Constants.ExceptionClass.REVIEW, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");

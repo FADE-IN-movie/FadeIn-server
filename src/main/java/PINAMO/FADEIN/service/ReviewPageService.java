@@ -7,7 +7,7 @@ import PINAMO.FADEIN.data.object.WriteReviewObject;
 
 public interface ReviewPageService {
 
-  ReviewPageDTO getReviewPage(Long userId);
+  ReviewPageDTO getReviewPage(Long userId, int year, int month);
 
   int deleteReview(String reviewId);
 

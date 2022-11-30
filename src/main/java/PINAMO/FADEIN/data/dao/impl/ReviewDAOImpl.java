@@ -47,6 +47,11 @@ public class ReviewDAOImpl implements ReviewDAO {
     }
 
     @Override
+    public List<ReviewEntity> getReviewsByUserIdAndDate(Long userId, String start, String end) {
+        return reviewRepository.findAllByUserIdAnAndWatchedDate(userId, start, end);
+    }
+
+    @Override
     public ReviewEntity saveReview(ReviewEntity reviewEntity) {
         return reviewRepository.save(reviewEntity);
     }
