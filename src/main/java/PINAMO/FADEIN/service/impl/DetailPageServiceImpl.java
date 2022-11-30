@@ -203,47 +203,50 @@ public class DetailPageServiceImpl implements DetailPageService {
 
   @Override
   public LikeDTO changeLikeState(LikeDTO likeDTO, Long userId) {
+    try {
+      Boolean currentLike = likeDTO.isCurrentLike();
 
-    Boolean currentLike = likeDTO.isCurrentLike();
+      if (currentLike) {
+        LikeEntity likeEntity = likeDataHandler.getLikeEntity(userId, likeDTO.getTmdbId());
+        likeDataHandler.deleteLikeEntity(likeEntity);
+      } else {
+        Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
 
-    if (currentLike) {
-      LikeEntity likeEntity = likeDataHandler.getLikeEntity(userId, likeDTO.getTmdbId());
-      likeDataHandler.deleteLikeEntity(likeEntity);
-    }
-    else {
-      Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
+        if (isContent) {
+          ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
+          UserEntity userEntity = userDataHandler.getUserEntity(userId);
+          LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
 
-      if (isContent) {
-        ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
-        UserEntity userEntity = userDataHandler.getUserEntity(userId);
-        LikeEntity likeEntity =  new LikeEntity(userEntity, contentEntity);
+          Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, likeDTO.getTmdbId());
 
-        Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, likeDTO.getTmdbId());
+          if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
+        } else {
+          String type = likeDTO.getType();
+          String path = type + "/" + likeDTO.getTmdbId();
 
-        if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
+          Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
+
+          ContentEntity returnContentEntity = map.keySet().iterator().next();
+          ArrayList<String> genre = map.get(returnContentEntity);
+
+          ContentEntity contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
+
+          for (int j = 0; j < genre.size(); j++)
+            contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
+
+          UserEntity userEntity = userDataHandler.getUserEntity(userId);
+          LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
+
+          Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, contentEntity.getTmdbId());
+          if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
+        }
       }
-      else {
-        String type = likeDTO.getType();
-        String path = type + "/" + likeDTO.getTmdbId();
+      LikeDTO return_likeDTO = new LikeDTO(likeDTO.getTmdbId(), likeDTO.getType(), !likeDTO.isCurrentLike());
 
-        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
-
-        ContentEntity returnContentEntity = map.keySet().iterator().next();
-        ArrayList<String> genre = map.get(returnContentEntity);
-
-        ContentEntity contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
-
-        for (int j=0; j<genre.size(); j++) contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
-
-        UserEntity userEntity = userDataHandler.getUserEntity(userId);
-        LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
-
-        Boolean isLike =  likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, contentEntity.getTmdbId());
-        if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
-      }
+      return return_likeDTO;
     }
-    LikeDTO return_likeDTO = new LikeDTO(likeDTO.getTmdbId(), likeDTO.getType(), !likeDTO.isCurrentLike());
-
-    return return_likeDTO;
+    catch (Exception e) {
+      return null;
+    }
   }
 }

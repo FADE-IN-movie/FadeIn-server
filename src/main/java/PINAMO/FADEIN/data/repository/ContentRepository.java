@@ -11,6 +11,7 @@ public interface ContentRepository extends JpaRepository<ContentEntity, Long> {
   ContentEntity getContentEntityByTmdbIdAndType(int tmdbId, String type);
 
   List<ContentEntity> findAllByType(String type);
+  List<ContentEntity> getContentEntitiesById(int contentId);
 
   Boolean existsByTmdbIdAndType(int tmdbId, String type);
 

@@ -2,6 +2,7 @@ package PINAMO.FADEIN.controller;
 
 import PINAMO.FADEIN.data.dto.movie.LikeDTO;
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
+import PINAMO.FADEIN.data.dto.movie.LikePageDTO;
 import PINAMO.FADEIN.data.object.CastObject;
 import PINAMO.FADEIN.data.object.DetailObject;
 import PINAMO.FADEIN.data.object.ContentObject;
@@ -73,7 +74,7 @@ public class DetailPageController {
   }
 
   @PostMapping(value = "/like")
-  public LikeDTO changeLikeStatus(@RequestBody LikeDTO changeLikeDTO, @RequestHeader(value = "authorization", required=false) String accessToken) {
+  public LikeDTO changeLikeStatus(@RequestBody LikeDTO changeLikeDTO, @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
 
     LOGGER.info("CHANGE LIKE STATUS.");
 
@@ -82,14 +83,14 @@ public class DetailPageController {
 
     boolean currentStatus = changeLikeDTO.isCurrentLike();
 
-    return detailPageService.changeLikeState(changeLikeDTO, (long) userId);
-  }
+    LikeDTO likeDTO = detailPageService.changeLikeState(changeLikeDTO, (long) userId);
+    if (likeDTO == null) {
+      LOGGER.error("ERROR OCCUR IN CHANGING LIKE STATUS.");
+      throw new CustomException(Constants.ExceptionClass.LIKE, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    }
 
-//  @PostMapping(value = "/recommend")
-//  public void postRecommendContents() {
-//    mainPageService.saveRecommend();
-//    LOGGER.info("SAVE RECOMMEND CONTENTS.");
-//  }
+    return likeDTO;
+  }
 
   @ExceptionHandler(value = CustomException.class)
   public ResponseEntity<Map<String, String>> ExceptionHandler(CustomException e) {
