@@ -1,9 +1,8 @@
 package PINAMO.FADEIN.service.impl;
 
 import PINAMO.FADEIN.data.Entity.UserEntity;
-import PINAMO.FADEIN.data.dto.user.accessTokenDTO;
-import PINAMO.FADEIN.data.dto.user.loginDTO;
-import PINAMO.FADEIN.data.dto.user.userDTO;
+import PINAMO.FADEIN.data.dto.user.AccessTokenDTO;
+import PINAMO.FADEIN.data.dto.user.LoginDTO;
 import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.UserService;
 import exception.CustomException;
@@ -16,13 +15,17 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import utils.JwtUtil;
+import utils.UserUtil;
 
 import java.net.URI;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+  UserUtil userUtil = new UserUtil();
 
   UserDataHandler userDataHandler;
 
@@ -32,10 +35,10 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public loginDTO saveUser(Long id, String userEmail, String userName, String userPicture) {
+  public LoginDTO saveUser(Long id, String userEmail, String userName, String userPicture) {
     UserEntity userEntity = userDataHandler.saveUserEntity(userEmail, userName, userPicture);
 
-    loginDTO loginDTO = new loginDTO(userEntity.getId(), userEntity.getUserEmail(), userEntity.getUserName(), userEntity.getUserImg());
+    LoginDTO loginDTO = new LoginDTO(userEntity.getId(), userEntity.getUserEmail(), userEntity.getUserName(), userEntity.getUserImg());
 
     return loginDTO;
   }
@@ -51,7 +54,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public loginDTO loginGoogleUser(String accessToken) {
+  public LoginDTO loginGoogleUser(String accessToken) {
     try {
       String[] check = accessToken.split("\\.");
 
@@ -64,37 +67,21 @@ public class UserServiceImpl implements UserService {
       String userName  = parser.getString("name");
       String userImage = parser.getString("picture");
 
-      JwtUtil jwtUtil = new JwtUtil();
-
       UserEntity is_existed = userDataHandler.getUserEntityByEmail(userEmail);
 
       if (is_existed == null) {
         UserEntity userEntity = userDataHandler.saveUserEntity(userEmail, userName, userImage);
 
-        Date accessExp = jwtUtil.createExp(1);
-        String returnAccessToken = jwtUtil.createAccessToken(userEntity.getId());
-//    Claims claims = jwtUtil.parseJwtToken(token);
+        Long userId = userEntity.getId();
 
-        Date refreshExp = jwtUtil.createExp(24);
-        String returnRefreshToken = jwtUtil.createRefreshToken(userEntity.getId());
-
-        System.out.println(returnRefreshToken);
-
-        loginDTO loginDTO = new loginDTO(userEntity.getId(), userEntity.getUserEmail(), userEntity.getUserName(), userEntity.getUserImg(), returnAccessToken, accessExp.toString(), returnRefreshToken, refreshExp.toString());
+        LoginDTO loginDTO = userUtil.issueTokens(userEntity, userId);
 
         return loginDTO;
       }
       else {
-        Date accessExp = jwtUtil.createExp(1);
-        String returnAccessToken = jwtUtil.createAccessToken(is_existed.getId());
-//    Claims claims = jwtUtil.parseJwtToken(token);
+        Long userId = is_existed.getId();
 
-        Date refreshExp = jwtUtil.createExp(24);
-        String returnRefreshToken = jwtUtil.createRefreshToken(is_existed.getId());
-
-        System.out.println(returnRefreshToken);
-
-        loginDTO loginDTO = new loginDTO(is_existed.getId(), is_existed.getUserEmail(), is_existed.getUserName(), is_existed.getUserImg(), returnAccessToken, accessExp.toString(), returnRefreshToken, refreshExp.toString());
+        LoginDTO loginDTO = userUtil.issueTokens(is_existed, userId);
 
         return loginDTO;
       }
@@ -105,7 +92,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public loginDTO loginNaverUser(String accessToken) {
+  public LoginDTO loginNaverUser(String accessToken) {
     try {
       URI uri = UriComponentsBuilder
           .fromUriString("https://openapi.naver.com/v1/nid/me")
@@ -130,33 +117,21 @@ public class UserServiceImpl implements UserService {
       String userName  = response.getString("name");
       String userImage = response.getString("profile_image");
 
-      JwtUtil jwtUtil = new JwtUtil();
-
       UserEntity is_existed = userDataHandler.getUserEntityByEmail(userEmail);
 
       if (is_existed == null) {
         UserEntity userEntity = userDataHandler.saveUserEntity(userEmail, userName, userImage);
 
-        Date accessExp = jwtUtil.createExp(1);
-        String returnAccessToken = jwtUtil.createAccessToken(userEntity.getId());
+        Long userId = userEntity.getId();
 
-        Date refreshExp = jwtUtil.createExp(24);
-        String returnRefreshToken = jwtUtil.createRefreshToken(userEntity.getId());
-
-        System.out.println(returnRefreshToken);
-
-        loginDTO loginDTO = new loginDTO(userEntity.getId(), userEntity.getUserEmail(), userEntity.getUserName(), userEntity.getUserImg(), returnAccessToken, accessExp.toString(), returnRefreshToken, refreshExp.toString());
+        LoginDTO loginDTO = userUtil.issueTokens(userEntity, userId);
 
         return loginDTO;
       }
       else {
-        Date accessExp = jwtUtil.createExp(1);
-        String returnAccessToken = jwtUtil.createAccessToken(is_existed.getId());
+        Long userId = is_existed.getId();
 
-        Date refreshExp = jwtUtil.createExp(24*14);
-        String returnRefreshToken = jwtUtil.createRefreshToken(is_existed.getId());
-
-        loginDTO loginDTO = new loginDTO(is_existed.getId(), is_existed.getUserEmail(), is_existed.getUserName(), is_existed.getUserImg(), returnAccessToken, accessExp.toString(), returnRefreshToken, refreshExp.toString());
+        LoginDTO loginDTO = userUtil.issueTokens(is_existed, userId);
 
         return loginDTO;
       }
@@ -167,25 +142,32 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public accessTokenDTO reissueAccessToken(String refreshToken) throws CustomException {
+  public AccessTokenDTO reissueAccessToken(String refreshToken) throws CustomException {
     JwtUtil jwtUtil = new JwtUtil();
 
-    if(jwtUtil.checkClaim(refreshToken)) {
-      Claims claims = jwtUtil.parseJwtToken(refreshToken);
+    String token = "Bearer " + refreshToken;
+    if(jwtUtil.checkClaim(token)) {
+      Claims claims = jwtUtil.parseJwtToken(token);
       int userId = (int) claims.get("id");
       Long longUserId = Long.valueOf(userId);
 
       if (getUser(longUserId) != null) {
-        Date accessExp = jwtUtil.createExp(1);
-        String accessToken = jwtUtil.createAccessToken(longUserId);
+        Map<String,String> accessTokenMap = jwtUtil.createAccessToken(longUserId);
 
-        accessTokenDTO accessTokenDTO = new accessTokenDTO(accessToken, accessExp.toString());
+        String accessToken = accessTokenMap.get("accessToken");
+        String accessTokenExp = accessTokenMap.get("accessTokenExp");
+
+        AccessTokenDTO accessTokenDTO = new AccessTokenDTO(accessToken, accessTokenExp);
 
         return accessTokenDTO;
       }
-      else return null;
+      else {
+        return null;
+      }
     }
-    else return null;
+    else {
+      return null;
+    }
   }
 
 }

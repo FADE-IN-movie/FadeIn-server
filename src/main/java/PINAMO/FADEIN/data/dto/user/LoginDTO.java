@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class loginDTO {
+public class LoginDTO {
 
   private Long id;
   private String userEmail;
@@ -19,6 +19,6 @@ public class loginDTO {
   private String refreshToken;
   private String refreshTokenExp;
 
-  public loginDTO(Long id, String userEmail, String userName, String userImg) {
+  public LoginDTO(Long id, String userEmail, String userName, String userImg) {
   }
 }

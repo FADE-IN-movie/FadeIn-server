@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class accessTokenDTO {
+public class AccessTokenDTO {
   private String accessToken;
   private String accessTokenExp;
 }

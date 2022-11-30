@@ -1,9 +1,8 @@
 package PINAMO.FADEIN.controller;
 
 import PINAMO.FADEIN.data.Entity.UserEntity;
-import PINAMO.FADEIN.data.dto.user.loginDTO;
-import PINAMO.FADEIN.data.dto.user.accessTokenDTO;
-import PINAMO.FADEIN.data.dto.user.userDTO;
+import PINAMO.FADEIN.data.dto.user.LoginDTO;
+import PINAMO.FADEIN.data.dto.user.AccessTokenDTO;
 import PINAMO.FADEIN.service.UserService;
 import exception.Constants;
 import exception.CustomException;
@@ -46,10 +45,10 @@ public class UserController {
   }
 
   @PostMapping(value = "/google")
-  public loginDTO loginGoogleUser(@RequestBody String accessToken) throws CustomException {
+  public LoginDTO loginGoogleUser(@RequestBody String accessToken) throws CustomException {
 
     LOGGER.info("LOGIN GOOGLE USER.");
-    loginDTO result = userService.loginGoogleUser(accessToken);
+    LoginDTO result = userService.loginGoogleUser(accessToken);
 
     if (result == null) {
       LOGGER.error("INTERNAL SERVER ERROR.");
@@ -59,10 +58,10 @@ public class UserController {
   }
 
   @PostMapping(value = "/naver")
-  public loginDTO loginNaverUser(@RequestBody String accessToken) throws CustomException {
+  public LoginDTO loginNaverUser(@RequestBody String accessToken) throws CustomException {
 
     LOGGER.info("LOGIN NAVER USER.");
-    loginDTO result = userService.loginNaverUser(accessToken);
+    LoginDTO result = userService.loginNaverUser(accessToken);
 
     if (result == null) {
       LOGGER.error("INTERNAL SERVER ERROR.");
@@ -72,10 +71,10 @@ public class UserController {
   }
 
   @PostMapping(value = "/refresh")
-  public accessTokenDTO reissueAccessToken(@RequestBody String refreshToken) throws CustomException {
+  public AccessTokenDTO reissueAccessToken(@RequestBody String refreshToken) throws CustomException {
 
     LOGGER.info("REFRESH ACCESS TOKEN.");
-    accessTokenDTO result = userService.reissueAccessToken(refreshToken);
+    AccessTokenDTO result = userService.reissueAccessToken(refreshToken);
 
     if (result == null) {
       LOGGER.error("UNAUTHORIZED REFRESH TOKEN.");
