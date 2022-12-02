@@ -14,6 +14,7 @@ import javax.persistence.*;
 public class ReviewEntity {
 
   @Id
+  @Column(columnDefinition = "VARCHAR(100)")
   private String id;
   @ManyToOne
   @JoinColumn(name ="userId", referencedColumnName = "id")
