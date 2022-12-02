@@ -17,9 +17,13 @@ public class ContentEntity {
   @GeneratedValue
   private Long id;
   private int tmdbId;
+  @Column(columnDefinition = "VARCHAR(10)")
   private String type;
+  @Column(columnDefinition = "VARCHAR(100)")
   private String title;
+  @Column(columnDefinition = "VARCHAR(100)")
   private String originalTitle;
+  @Column(columnDefinition = "VARCHAR(100)")
   private String poster;
   private int runtime;
   @Column(columnDefinition = "TEXT")

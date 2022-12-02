@@ -19,6 +19,7 @@ public class ContentGenreEntity {
   @ManyToOne
   @JoinColumn(name ="contentId", referencedColumnName = "id")
   private ContentEntity contentEntity;
+  @Column(columnDefinition = "VARCHAR(20)")
   private String genre;
 
   public ContentGenreEntity(ContentEntity contentEntity, String genre) {
