@@ -25,7 +25,9 @@ public class ReviewEntity {
   private String watchedDate;
   @Column(columnDefinition = "TIME")
   private String watchedTime;
+  @Column(columnDefinition = "VARCHAR(100)")
   private String watchedIn;
+  @Column(columnDefinition = "VARCHAR(100)")
   private String watchedWith;
   @Column(columnDefinition = "DECIMAL(3,1) NOT NULL")
   private float rating;
