@@ -10,11 +10,11 @@ public interface LikeDataHandler {
 
   LikeEntity saveLikeEntity(LikeEntity likeEntity);
 
-  LikeEntity getLikeEntity(Long userId, int tmdbId);
+  LikeEntity getLikeEntityByUserIdAndContentId(Long userId, Long contentId);
   List<LikeEntity> getLikeEntitiesByUserId(Long userId);
 
   int deleteLikeEntity(LikeEntity likeEntity);
 
-  Boolean isLikeEntityByUserIdAndTmdbId(Long userId, int tmdbId);
+  Boolean isLikeEntityByUserIdAndContentId(Long userId, Long contentId);
 
 }

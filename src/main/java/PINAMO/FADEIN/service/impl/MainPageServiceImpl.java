@@ -7,10 +7,7 @@ import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.movie.RankingPageDTO;
 import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
-import PINAMO.FADEIN.handler.ContentDataHandler;
-import PINAMO.FADEIN.handler.ContentGenreDataHandler;
-import PINAMO.FADEIN.handler.LikeDataHandler;
-import PINAMO.FADEIN.handler.UserDataHandler;
+import PINAMO.FADEIN.handler.*;
 import PINAMO.FADEIN.service.MainPageService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,7 +164,7 @@ public class MainPageServiceImpl implements MainPageService {
 
         String path = "movie" + "/" + movie[i];
 
-        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
+        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path, "yes");
 
         ContentEntity returnContentEntity = map.keySet().iterator().next();
         ArrayList<String> genre = map.get(returnContentEntity);
@@ -181,7 +178,7 @@ public class MainPageServiceImpl implements MainPageService {
       for (int i = 0; i < tv.length; i++) {
         String path = "tv" + "/" + tv[i];
 
-        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
+        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path, "yes");
 
         ContentEntity returnContentEntity = map.keySet().iterator().next();
         ArrayList<String> genre = map.get(returnContentEntity);

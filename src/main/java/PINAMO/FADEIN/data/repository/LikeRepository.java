@@ -11,9 +11,9 @@ import java.util.List;
 
 public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
 
-  LikeEntity findByUserEntity_IdAndContentEntity_TmdbId(Long userId, int tmdbId);
+  LikeEntity findByUserEntity_IdAndContentEntity_Id(Long userId, Long contentId);
   List<LikeEntity> findAllByUserEntity_Id(Long userId);
 
-  boolean existsByUserEntity_IdAndContentEntity_TmdbId(Long userId, int tmdbId);
+  boolean existsByUserEntity_IdAndContentEntity_Id(Long userId, Long contentId);
 
 }

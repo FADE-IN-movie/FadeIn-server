@@ -28,8 +28,9 @@ public class ContentEntity {
   private int runtime;
   @Column(columnDefinition = "TEXT")
   private String overview;
+  private String isRecommended;
 
-  public ContentEntity(int tmdbId, String type, String title, String originalTitle, String poster, int runtime, String overview) {
+  public ContentEntity(int tmdbId, String type, String title, String originalTitle, String poster, int runtime, String overview, String isRecommended) {
     this.tmdbId = tmdbId;
     this.type = type;
     this.title = title;
@@ -37,6 +38,7 @@ public class ContentEntity {
     this.poster = poster;
     this.runtime = runtime;
     this.overview = overview;
+    this.isRecommended = isRecommended;
   }
 
 }

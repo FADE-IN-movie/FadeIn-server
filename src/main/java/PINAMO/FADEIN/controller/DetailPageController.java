@@ -43,8 +43,6 @@ public class DetailPageController {
                                      @RequestParam(defaultValue = "movie", required = false) String type,
                                      @RequestHeader(value = "authorization", required=false) String accessToken) throws CustomException{
 
-    System.out.println(accessToken);
-
     LOGGER.info("GET CONTENT DETAIL.");
 
     int userId = 0;
@@ -52,7 +50,7 @@ public class DetailPageController {
 
     String path = type + "/" + tmdbId;
 
-    DetailObject detail = detailPageService.getDetail(path);
+    DetailObject detail = detailPageService.getDetail(path, type);
     if (detail == null) {
       LOGGER.error("ERROR OCCUR IN GETTING DETAILS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
@@ -70,7 +68,7 @@ public class DetailPageController {
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
-    return detailPageService.getDetailPage((long) userId, detail, cast, similarContents);
+    return detailPageService.getDetailPage((long) userId, type, detail, cast, similarContents);
   }
 
   @PostMapping(value = "/like")

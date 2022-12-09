@@ -1,6 +1,5 @@
 package PINAMO.FADEIN.controller;
 
-import PINAMO.FADEIN.data.dto.movie.SearchPageDTO;
 import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
 import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
 import PINAMO.FADEIN.data.dto.movie.WriteSearchDTO;
@@ -91,6 +90,28 @@ public class WritePageController {
     }
 
     return new ResponseEntity(HttpStatus.CREATED);
+  }
+
+  @PatchMapping(value = "/{reviewId}")
+  public ResponseEntity modifyReview(@PathVariable String reviewId,
+                                    @RequestBody WriteReviewDTO writeReviewDTO,
+                                    @RequestHeader(value = "authorization") String accessToken) throws CustomException {
+
+    LOGGER.info("MODIFY REVIEW.");
+
+    int userId = 0;
+    if (accessToken!=null && jwtUtil.checkClaim(accessToken)) userId = jwtUtil.getUserIdInJwtToken(accessToken);
+    else {
+      LOGGER.error("UNAUTHORIZED ACCESS TOKEN.");
+      throw new CustomException(Constants.ExceptionClass.USER, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED ACCESS TOKEN");
+    }
+
+    if (!writePageService.writeReview(reviewId, (long) userId, writeReviewDTO)) {
+      LOGGER.error("ERROR OCCUR IN MODIFYING REVIEW.");
+      throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
+    }
+
+    return new ResponseEntity(HttpStatus.ACCEPTED);
   }
 
   @GetMapping(value = "/search")

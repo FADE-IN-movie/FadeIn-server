@@ -50,8 +50,8 @@ public class WritePageServiceImpl implements WritePageService {
       int tmdbId = parser.getInt("id");
       String title;
       String originalTitle;
-      String poster = movieUtil.posterTransducer(parser.get("poster_path"));
-      String backdrop = movieUtil.posterTransducer(parser.get("backdrop_path"));
+      String poster = movieUtil.posterTransducer(parser.get("poster_path"), "poster");
+      String backdrop = movieUtil.posterTransducer(parser.get("backdrop_path"), "backdrop");
       String type = path.split("/")[0];
       if (type.equals("movie")) {
         title = parser.getString("title");
@@ -78,10 +78,13 @@ public class WritePageServiceImpl implements WritePageService {
       System.out.println(reviewId);
       if (reviewDataHandler.isReviewEntity(reviewId)) {
         reviewEntity = reviewDataHandler.getReviewEntity(reviewId);
-        String watchedAt = reviewEntity.getWatchedDate() +  "T" + reviewEntity.getWatchedTime();
-        writeReviewObject = new WriteReviewObject(reviewId, watchedAt, reviewEntity.getWatchedIn(), reviewEntity.getWatchedWith(), reviewEntity.getRating(), reviewEntity.getMemo(), reviewEntity.getComment());
-      } else {
-        writeReviewObject = new WriteReviewObject("", "", "", "", (float) 0.0, "", "");
+        String watchedTime = new String();
+        if (reviewEntity.getWatchedTime() == null) watchedTime = "";
+        else watchedTime = reviewEntity.getWatchedTime();
+        writeReviewObject = new WriteReviewObject(reviewId, reviewEntity.getWatchedDate(), watchedTime, reviewEntity.getWatchedIn(), reviewEntity.getWatchedWith(), reviewEntity.getRating(), reviewEntity.getMemo(), reviewEntity.getComment());
+      }
+      else {
+        writeReviewObject = new WriteReviewObject("", "", "", "", "", (float) 0.0, "", "");
       }
 
       return writeReviewObject;
@@ -120,7 +123,7 @@ public class WritePageServiceImpl implements WritePageService {
 
         ArrayList<String> return_genres = movieUtil.GenreTransducer(detail.getJSONArray("genre_ids"));
 
-        String poster = movieUtil.posterTransducer(detail.get("poster_path"));
+        String poster = movieUtil.posterTransducer(detail.get("poster_path"), "poster");
 
         ContentObject movie = new ContentObject(tmdbId, type, title, return_genres, poster, overview);
 
@@ -135,7 +138,7 @@ public class WritePageServiceImpl implements WritePageService {
 
   @Override
   public boolean writeReview(String reviewId, Long userId, WriteReviewDTO writeReviewDTO) {
-      try {
+//      try {
         String type = writeReviewDTO.getType();
 
         Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(writeReviewDTO.getTmdbId(), type);
@@ -146,7 +149,7 @@ public class WritePageServiceImpl implements WritePageService {
         else {
           String path = type + "/" + writeReviewDTO.getTmdbId();
 
-          Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
+          Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path, "no");
 
           ContentEntity returnContentEntity = map.keySet().iterator().next();
           ArrayList<String> genre = map.get(returnContentEntity);
@@ -156,21 +159,24 @@ public class WritePageServiceImpl implements WritePageService {
           for (int j = 0; j < genre.size(); j++)
             contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
         }
-        String watched_date = writeReviewDTO.getWatchedAt().split("T")[0];
-        String watched_time = writeReviewDTO.getWatchedAt().split("T")[1];
+
+        String watchedDate = writeReviewDTO.getWatchedDate();
+        String watchedTime = writeReviewDTO.getWatchedTime();
+
+        if (watchedTime.length() < 1) watchedTime = null;
 
         UserEntity userEntity = userDataHandler.getUserEntity(userId);
 
         if (reviewDataHandler.isReviewEntity(reviewId)) {
-          reviewDataHandler.updateReviewEntity(reviewId, watched_date, watched_time, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment());
+          reviewDataHandler.updateReviewEntity(reviewId, watchedDate, watchedTime, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment());
         }
         else {
-          reviewDataHandler.saveReviewEntity(new ReviewEntity(reviewId, userEntity, contentEntity, watched_date, watched_time, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment()));
+          reviewDataHandler.saveReviewEntity(new ReviewEntity(reviewId, userEntity, contentEntity, watchedDate, watchedTime, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment()));
         }
         return true;
-      }
-      catch (Exception e){
-        return false;
-      }
+//      }
+//      catch (Exception e){
+//        return false;
+//      }
   }
 }

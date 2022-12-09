@@ -1,7 +1,6 @@
 package PINAMO.FADEIN.handler.impl;
 
 import PINAMO.FADEIN.data.Entity.ContentEntity;
-import PINAMO.FADEIN.data.Entity.RecommendEntity;
 import PINAMO.FADEIN.data.dao.ContentDAO;
 import PINAMO.FADEIN.handler.ContentDataHandler;
 import org.springframework.beans.factory.annotation.Autowired;

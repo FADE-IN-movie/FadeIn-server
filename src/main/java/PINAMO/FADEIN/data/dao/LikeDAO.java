@@ -9,10 +9,10 @@ import java.util.List;
 public interface LikeDAO {
   LikeEntity saveLike(LikeEntity likeEntity);
 
-  LikeEntity getLike(Long userId, int tmdbId);
+  LikeEntity getLikeByUserIdAndContentId(Long userId, Long contentId);
   List<LikeEntity> getLikesByUserId(Long userId);
 
   int deleteLike(LikeEntity likeEntity);
 
-  Boolean isLikeByUserIdAndTmdbId(Long userId, int tmdbId);
+  Boolean isLikeByUserIdAndContentId(Long userId, Long contentId);
 }

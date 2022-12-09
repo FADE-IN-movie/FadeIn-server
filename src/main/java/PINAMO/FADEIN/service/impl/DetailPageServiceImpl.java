@@ -43,7 +43,7 @@ public class DetailPageServiceImpl implements DetailPageService {
   }
 
   @Override
-  public DetailObject getDetail(String path) {
+  public DetailObject getDetail(String path, String type) {
 
     try {
       String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
@@ -52,8 +52,8 @@ public class DetailPageServiceImpl implements DetailPageService {
       int contentId = parser.getInt("id");
       String title;
       String originalTitle;
-      String poster = movieUtil.posterTransducer(parser.get("poster_path"));
-      String backdrop = movieUtil.posterTransducer(parser.get("backdrop_path"));
+      String poster = movieUtil.posterTransducer(parser.get("poster_path"), "poster");
+      String backdrop = movieUtil.posterTransducer(parser.get("backdrop_path"), "backdrop");
       String releaseDate;
       String country;
       String runtime;
@@ -61,7 +61,6 @@ public class DetailPageServiceImpl implements DetailPageService {
 
       ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
 
-      String type = path.split("/")[0];
       if (type.equals("movie")) {
         title = parser.getString("title");
         originalTitle = parser.getString("original_title");
@@ -107,8 +106,14 @@ public class DetailPageServiceImpl implements DetailPageService {
 
       List<CastObject> returnCast = new ArrayList<>();
 
-      if (crews.length() != 0) {
-        for (int i = 0; i < crews.length(); i++) {
+      int crewSize;
+      int crewLength = crews.length();
+
+      if (crewLength < 5) crewSize = crewLength;
+      else crewSize = 5;
+
+      if (crewSize != 0) {
+        for (int i = 0; i < crewSize; i++) {
           JSONObject crew = (JSONObject) crews.get(i);
 
           String job = crew.getString("job");
@@ -128,12 +133,15 @@ public class DetailPageServiceImpl implements DetailPageService {
       }
 
       JSONArray casts = parser.getJSONArray("cast");
+
+      int castSize;
       int castLength = casts.length();
 
-      if (castLength != 0) {
-        if (castLength > 5) castLength = 5;
+      if (castLength < 5) castSize = casts.length();
+      else castSize = 5;
 
-        for (int i = 0; i < castLength; i++) {
+      if (castSize != 0) {
+        for (int i = 0; i < castSize; i++) {
           JSONObject cast = (JSONObject) casts.get(i);
 
           String name = cast.getString("name");
@@ -165,8 +173,14 @@ public class DetailPageServiceImpl implements DetailPageService {
 
       List<ContentObject> returnSimilarMovies = new ArrayList<>();
 
-      if (similarMovies.length() != 0) {
-        for (int i = 0; i < 5; i++) {
+      int similarContentSize;
+      int similarContentLength = similarMovies.length();
+
+      if (similarContentLength < 5) similarContentSize =  similarContentLength;
+      else similarContentSize = 5;
+
+      if (similarContentSize != 0) {
+        for (int i = 0; i < similarContentSize; i++) {
           JSONObject movie = (JSONObject) similarMovies.get(i);
 
           int id = movie.getInt("id");
@@ -178,7 +192,7 @@ public class DetailPageServiceImpl implements DetailPageService {
 
           ArrayList<String> return_genres = movieUtil.GenreTransducer(movie.getJSONArray("genre_ids"));
 
-          String poster = movieUtil.posterTransducer(movie.get("poster_path"));
+          String poster = movieUtil.posterTransducer(movie.get("poster_path"), "poster");
 
           String overview = movie.getString("overview");
 
@@ -195,8 +209,16 @@ public class DetailPageServiceImpl implements DetailPageService {
   }
 
   @Override
-  public DetailPageDTO getDetailPage(Long userId, DetailObject detail, List<CastObject> cast, List<ContentObject> similarContents) {
-    Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, detail.getTmdbId());
+  public DetailPageDTO getDetailPage(Long userId, String type, DetailObject detail, List<CastObject> cast, List<ContentObject> similarContents) {
+    Boolean isContentEntity = contentDataHandler.isContentEntityByTmdbIdAndType(detail.getTmdbId(), type);
+
+    Boolean isLike = false;
+
+    if (isContentEntity) {
+      ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(detail.getTmdbId(), type);
+      isLike = likeDataHandler.isLikeEntityByUserIdAndContentId(userId, contentEntity.getId());
+    }
+
     DetailPageDTO detailPageDTO = new DetailPageDTO(detail, cast, similarContents, isLike);
     return detailPageDTO;
   }
@@ -204,43 +226,45 @@ public class DetailPageServiceImpl implements DetailPageService {
   @Override
   public LikeDTO changeLikeState(LikeDTO likeDTO, Long userId) {
     try {
-      Boolean currentLike = likeDTO.isCurrentLike();
+      Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
 
-      if (currentLike) {
-        LikeEntity likeEntity = likeDataHandler.getLikeEntity(userId, likeDTO.getTmdbId());
-        likeDataHandler.deleteLikeEntity(likeEntity);
-      } else {
-        Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
+      if (isContent) {
+        ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
+        Boolean currentLike = likeDataHandler.isLikeEntityByUserIdAndContentId(userId,contentEntity.getId());
 
-        if (isContent) {
-          ContentEntity contentEntity = contentDataHandler.getContentEntityByTmdbIdAndType(likeDTO.getTmdbId(), likeDTO.getType());
+        if (currentLike) {
+          LikeEntity likeEntity = likeDataHandler.getLikeEntityByUserIdAndContentId(userId, contentEntity.getId());
+          likeDataHandler.deleteLikeEntity(likeEntity);
+        }
+        else {
           UserEntity userEntity = userDataHandler.getUserEntity(userId);
           LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
 
-          Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, likeDTO.getTmdbId());
-
-          if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
-        } else {
-          String type = likeDTO.getType();
-          String path = type + "/" + likeDTO.getTmdbId();
-
-          Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path);
-
-          ContentEntity returnContentEntity = map.keySet().iterator().next();
-          ArrayList<String> genre = map.get(returnContentEntity);
-
-          ContentEntity contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
-
-          for (int j = 0; j < genre.size(); j++)
-            contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
-
-          UserEntity userEntity = userDataHandler.getUserEntity(userId);
-          LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
-
-          Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndTmdbId(userId, contentEntity.getTmdbId());
+          Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndContentId(userId, contentEntity.getId());
           if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
         }
       }
+      else {
+        String type = likeDTO.getType();
+        String path = type + "/" + likeDTO.getTmdbId();
+
+        Map<ContentEntity, ArrayList<String>> map = movieUtil.getContentByEntity(type, path, "no");
+
+        ContentEntity returnContentEntity = map.keySet().iterator().next();
+        ArrayList<String> genre = map.get(returnContentEntity);
+
+        ContentEntity contentEntity = contentDataHandler.saveContentEntity(returnContentEntity);
+
+        for (int j = 0; j < genre.size(); j++)
+          contentGenreDataHandler.saveContentGenreEntity(new ContentGenreEntity(contentEntity, genre.get(j)));
+
+        UserEntity userEntity = userDataHandler.getUserEntity(userId);
+        LikeEntity likeEntity = new LikeEntity(userEntity, contentEntity);
+
+        Boolean isLike = likeDataHandler.isLikeEntityByUserIdAndContentId(userId, contentEntity.getId());
+        if (!isLike) likeDataHandler.saveLikeEntity(likeEntity);
+      }
+
       LikeDTO return_likeDTO = new LikeDTO(likeDTO.getTmdbId(), likeDTO.getType(), !likeDTO.isCurrentLike());
 
       return return_likeDTO;

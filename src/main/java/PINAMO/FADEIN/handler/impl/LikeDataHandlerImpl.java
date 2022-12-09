@@ -28,8 +28,8 @@ public class LikeDataHandlerImpl implements LikeDataHandler {
   }
 
   @Override
-  public LikeEntity getLikeEntity(Long userId, int tmdbId) {
-    return likeDAO.getLike(userId, tmdbId);
+  public LikeEntity getLikeEntityByUserIdAndContentId(Long userId, Long contentId) {
+    return likeDAO.getLikeByUserIdAndContentId(userId, contentId);
   }
 
   @Override
@@ -43,8 +43,8 @@ public class LikeDataHandlerImpl implements LikeDataHandler {
   }
 
   @Override
-  public Boolean isLikeEntityByUserIdAndTmdbId(Long userId, int tmdbId) {
-    return likeDAO.isLikeByUserIdAndTmdbId(userId, tmdbId);
+  public Boolean isLikeEntityByUserIdAndContentId(Long userId, Long contentId) {
+    return likeDAO.isLikeByUserIdAndContentId(userId, contentId);
   }
 
 

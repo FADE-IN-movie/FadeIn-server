@@ -1,7 +1,6 @@
 package PINAMO.FADEIN.data.dao.impl;
 
 import PINAMO.FADEIN.data.Entity.ContentEntity;
-import PINAMO.FADEIN.data.Entity.RecommendEntity;
 import PINAMO.FADEIN.data.dao.ContentDAO;
 import PINAMO.FADEIN.data.repository.ContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class ContentDAOImpl implements ContentDAO {
 
   @Override
   public List<ContentEntity> getContentsByType(String type) {
-    List<ContentEntity> contentEntities = contentRepository.findAllByType(type);
+    List<ContentEntity> contentEntities = contentRepository.findAllByTypeAndIsRecommended(type, "yes");
     return contentEntities;
   }
 

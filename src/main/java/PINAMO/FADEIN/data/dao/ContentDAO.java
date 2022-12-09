@@ -8,7 +8,7 @@ public interface ContentDAO {
   ContentEntity saveContent(ContentEntity contentEntity);
 
   ContentEntity getContent(Long contentId);
-  ContentEntity getContentByTmdbIdAndType(int tmdbId, String type);
+  ContentEntity getContentByTmdbIdAndType(int tmdbId, String isRecommended);
   List<ContentEntity> getContentsByType(String type);
 
   Boolean isContentByTmdbIdAndType(int tmdbId, String type);

@@ -237,12 +237,17 @@ public class MovieUtil {
     return overview;
   }
 
-  public String posterTransducer(Object poster_path) {
+  public String posterTransducer(Object poster_path, String type) {
     String poster;
 
-    if (poster_path.equals(null)) poster = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg";
-    else poster = "https://image.tmdb.org/t/p/original" + poster_path;
-
+    if (poster_path.equals(null)) {
+      if (type.equals("backdrop")) poster = "";
+      else poster = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg";
+    }
+    else {
+      if (type.equals("backdrop")) poster = "https://image.tmdb.org/t/p/w780" + poster_path;
+      else poster = "https://image.tmdb.org/t/p/w342" + poster_path;
+    }
     return poster;
   }
 
@@ -270,6 +275,7 @@ public class MovieUtil {
 
     String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko%s&page=%d", path, query, page);
 
+    System.out.println(requestURL);
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
     JSONArray arrayList = parser.getJSONArray("results");
@@ -277,7 +283,7 @@ public class MovieUtil {
     List<ContentObject> return_movies = new ArrayList<>();
 
     if (arrayList.length() != 0) {
-      if (menu.equals("search")) size = arrayList.length();
+      if (menu.equals("search") || menu.equals("discover")) size = arrayList.length();
 
       for (int i = 0; i < size; i++) {
         JSONObject detail = (JSONObject) arrayList.get(i);
@@ -297,7 +303,7 @@ public class MovieUtil {
 
         ArrayList<String> return_genres = movieUtil.GenreTransducer(detail.getJSONArray("genre_ids"));
 
-        String poster = posterTransducer(detail.get("poster_path"));
+        String poster = posterTransducer(detail.get("poster_path"), "poster");
 
         ContentObject movie;
 
@@ -394,14 +400,14 @@ public class MovieUtil {
     return searchLengthDTO;
   }
 
-  public Map<ContentEntity,ArrayList<String>> getContentByEntity(String type, String path) {
+  public Map<ContentEntity,ArrayList<String>> getContentByEntity(String type, String path, String isRecommended) {
 
     String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
 
     JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
 
     int tmdbId = parser.getInt("id");
-    String poster = posterTransducer(parser.get("poster_path"));
+    String poster = posterTransducer(parser.get("poster_path"), "poster");
     String overview = parser.getString("overview");
     ArrayList<String> genre = GenreTransducerByName(parser.getJSONArray("genres"));
 
@@ -422,7 +428,7 @@ public class MovieUtil {
       else runtime = 0;
     }
 
-    ContentEntity contentEntity = new ContentEntity(tmdbId, type, title, originalTitle, poster, runtime, overview);
+    ContentEntity contentEntity = new ContentEntity(tmdbId, type, title, originalTitle, poster, runtime, overview, isRecommended);
 
     Map<ContentEntity,ArrayList<String>> map = new HashMap<>();
     map.put(contentEntity, genre);

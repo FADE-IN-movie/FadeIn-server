@@ -1,13 +1,7 @@
 package PINAMO.FADEIN.controller;
 
 import PINAMO.FADEIN.data.dto.movie.ReviewPageDTO;
-import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
-import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
-import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
-import PINAMO.FADEIN.data.object.WriteContentObject;
-import PINAMO.FADEIN.data.object.WriteReviewObject;
 import PINAMO.FADEIN.service.ReviewPageService;
-import PINAMO.FADEIN.service.WritePageService;
 import exception.Constants;
 import exception.CustomException;
 import org.slf4j.Logger;

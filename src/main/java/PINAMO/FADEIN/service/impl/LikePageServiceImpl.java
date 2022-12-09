@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import utils.MovieUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -62,6 +63,9 @@ public class LikePageServiceImpl implements LikePageService {
         if (contentEntity.getType().equals("movie")) likeMovie.add(contentObject);
         else likeTv.add(contentObject);
       }
+
+      Collections.reverse(likeMovie);
+      Collections.reverse(likeTv);
 
       LikePageDTO likePageDTO = new LikePageDTO(likeMovie, likeTv);
 

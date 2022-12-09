@@ -18,7 +18,7 @@ public class RankingPageServiceImpl implements RankingPageService {
 
   @Override
   public RankingPageDTO getRankingPage(String genre, String type, String sortBy, int page) {
-    try {
+//    try {
       if (sortBy.equals("rating")) sortBy = "&sort_by=vote_average.desc";
       else if (sortBy.equals("date")) sortBy = "&sort_by=primary_released_date.desc";
       else if (sortBy.equals("popularity")) sortBy = "&sort_by=popularity.desc";
@@ -30,9 +30,9 @@ public class RankingPageServiceImpl implements RankingPageService {
       RankingPageDTO rankingPageDTO = new RankingPageDTO(movieUtil.getMovies(type, "discover", page, query));
 
       return rankingPageDTO;
-    }
-    catch (Exception e) {
-      return null;
-    }
+//    }
+//    catch (Exception e) {
+//      return null;
+//    }
   }
 }

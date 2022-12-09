@@ -10,7 +10,8 @@ import lombok.*;
 public class WriteReviewObject {
 
   private String reviewId;
-  private String watchedAt;
+  private String watchedDate;
+  private String watchedTime;
   private String watchedIn;
   private String watchedWith;
   private float rating;
