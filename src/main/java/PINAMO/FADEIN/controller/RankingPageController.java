@@ -33,6 +33,11 @@ public class RankingPageController {
                                       @RequestParam(defaultValue = "popularity", required = false) String sortBy,
                                       @RequestParam(defaultValue = "1", required = false) int page) throws CustomException{
 
+    System.out.println(genre);
+    System.out.println(type);
+    System.out.println(sortBy);
+    System.out.println(page);
+
     LOGGER.info("GET RANKING RESULTS.");
 
     RankingPageDTO rankingPageDTO = rankingPageService.getRankingPage(genre, type, sortBy, page);
