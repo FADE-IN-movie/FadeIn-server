@@ -14,6 +14,7 @@ public class WriteSearchDTO {
 
   private int total;
   private List<ContentObject> search;
+  private boolean isLastPage;
 
 }
 

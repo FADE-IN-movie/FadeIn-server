@@ -103,6 +103,7 @@ public class WritePageServiceImpl implements WritePageService {
     JSONArray results = parser.getJSONArray("results");
 
     int total = parser.getInt("total_results");
+    int totalPage = parser.getInt("total_pages");
 
     List<ContentObject> return_movies = new ArrayList<>();
 
@@ -131,7 +132,10 @@ public class WritePageServiceImpl implements WritePageService {
       }
     }
 
-    WriteSearchDTO writeSearchDTO = new WriteSearchDTO(total, return_movies);
+    boolean isLastPage = false;
+    if (totalPage==page) isLastPage = true;
+
+    WriteSearchDTO writeSearchDTO = new WriteSearchDTO(total, return_movies, isLastPage);
 
     return writeSearchDTO;
   }
