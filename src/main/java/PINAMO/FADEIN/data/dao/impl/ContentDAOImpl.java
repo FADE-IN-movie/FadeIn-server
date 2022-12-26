@@ -45,4 +45,10 @@ public class ContentDAOImpl implements ContentDAO {
   public Boolean isContentByTmdbIdAndType(int tmdbId, String type) {
     return contentRepository.existsByTmdbIdAndType(tmdbId, type);
   }
+
+  @Override
+  public Boolean iSContentByType(String type) {
+    return contentRepository.existsByType(type);
+  }
+
 }

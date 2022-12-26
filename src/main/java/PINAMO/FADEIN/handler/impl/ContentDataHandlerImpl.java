@@ -45,4 +45,9 @@ public class ContentDataHandlerImpl implements ContentDataHandler {
     return contentDAO.isContentByTmdbIdAndType(tmdbId, type);
   }
 
+  @Override
+  public Boolean isContentEntityByType(String type) {
+    return contentDAO.iSContentByType(type);
+  }
+
 }

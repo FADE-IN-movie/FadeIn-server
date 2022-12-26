@@ -119,6 +119,10 @@ public class MainPageServiceImpl implements MainPageService {
     try {
       List<ContentObject> result = new ArrayList<>();
 
+      boolean isContent = contentDataHandler.isContentEntityByType(type);
+
+      if (!isContent) saveRecommend(type);
+
       List<ContentEntity> contentEntities = contentDataHandler.getContentEntitiesByType(type);
 
       Random random = new Random();

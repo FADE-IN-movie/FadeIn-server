@@ -13,5 +13,6 @@ public interface ContentDataHandler {
   List<ContentEntity> getContentEntitiesByType(String type);
 
   Boolean isContentEntityByTmdbIdAndType(int tmdbId, String type);
+  Boolean isContentEntityByType(String type);
 
 }

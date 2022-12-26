@@ -13,5 +13,6 @@ public interface ContentRepository extends JpaRepository<ContentEntity, Long> {
   List<ContentEntity> getContentEntitiesById(int contentId);
 
   Boolean existsByTmdbIdAndType(int tmdbId, String type);
+  Boolean existsByType(String type);
 
 }

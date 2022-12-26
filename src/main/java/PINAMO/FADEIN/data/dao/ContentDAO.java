@@ -12,4 +12,6 @@ public interface ContentDAO {
   List<ContentEntity> getContentsByType(String type);
 
   Boolean isContentByTmdbIdAndType(int tmdbId, String type);
+  Boolean iSContentByType(String type);
+
 }
