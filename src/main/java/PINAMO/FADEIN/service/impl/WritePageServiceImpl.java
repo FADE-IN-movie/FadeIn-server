@@ -113,22 +113,30 @@ public class WritePageServiceImpl implements WritePageService {
 
         int tmdbId = detail.getInt("id");
         String type = detail.getString("media_type");
-        if (type.equals("person")) continue;
 
         String title;
-        if (type.equals("movie")) title = detail.getString("title");
-        else title = detail.getString("name");
 
-        String overview = detail.getString("overview");
-        if (overview.equals("")) overview = movieUtil.overviewTransducer(type, tmdbId);
+        if (!type.equals("movie") && !type.equals("tv")) {
+          ContentObject movie = new ContentObject(0, "movie", "", null, "", "");
 
-        ArrayList<String> return_genres = movieUtil.GenreTransducer(detail.getJSONArray("genre_ids"));
+          return_movies.add(movie);
+        }
 
-        String poster = movieUtil.posterTransducer(detail.get("poster_path"), "poster");
+        else {
+          if (type.equals("movie")) title = detail.getString("title");
+          else title = detail.getString("name");
 
-        ContentObject movie = new ContentObject(tmdbId, type, title, return_genres, poster, overview);
+          String overview = detail.getString("overview");
+          if (overview.equals("")) overview = movieUtil.overviewTransducer(type, tmdbId);
 
-        return_movies.add(movie);
+          ArrayList<String> return_genres = movieUtil.GenreTransducer(detail.getJSONArray("genre_ids"));
+
+          String poster = movieUtil.posterTransducer(detail.get("poster_path"), "poster");
+
+          ContentObject movie = new ContentObject(tmdbId, type, title, return_genres, poster, overview);
+
+          return_movies.add(movie);
+        }
       }
     }
 
