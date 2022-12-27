@@ -103,7 +103,6 @@ public class WritePageServiceImpl implements WritePageService {
     JSONArray results = parser.getJSONArray("results");
 
     int total = parser.getInt("total_results");
-    int totalPage = parser.getInt("total_pages");
 
     List<ContentObject> return_movies = new ArrayList<>();
 
@@ -140,17 +139,14 @@ public class WritePageServiceImpl implements WritePageService {
       }
     }
 
-    boolean isLastPage = false;
-    if (totalPage==page) isLastPage = true;
-
-    WriteSearchDTO writeSearchDTO = new WriteSearchDTO(total, return_movies, isLastPage);
+    WriteSearchDTO writeSearchDTO = new WriteSearchDTO(total, return_movies);
 
     return writeSearchDTO;
   }
 
   @Override
   public boolean writeReview(String reviewId, Long userId, WriteReviewDTO writeReviewDTO) {
-//      try {
+      try {
         String type = writeReviewDTO.getType();
 
         Boolean isContent = contentDataHandler.isContentEntityByTmdbIdAndType(writeReviewDTO.getTmdbId(), type);
@@ -186,9 +182,9 @@ public class WritePageServiceImpl implements WritePageService {
           reviewDataHandler.saveReviewEntity(new ReviewEntity(reviewId, userEntity, contentEntity, watchedDate, watchedTime, writeReviewDTO.getWatchedIn(), writeReviewDTO.getWatchedWith(), writeReviewDTO.getRating(), writeReviewDTO.getMemo(), writeReviewDTO.getComment()));
         }
         return true;
-//      }
-//      catch (Exception e){
-//        return false;
-//      }
+      }
+      catch (Exception e){
+        return false;
+      }
   }
 }
