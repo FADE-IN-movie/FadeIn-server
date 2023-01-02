@@ -1,5 +1,7 @@
 package PINAMO.FADEIN.utils;
 
+import PINAMO.FADEIN.data.Entity.UserEntity;
+import PINAMO.FADEIN.data.dto.user.LoginDTO;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -116,4 +118,22 @@ public class JwtUtil {
       return 0;
     }
   }
+
+  public LoginDTO issueTokens(UserEntity userEntity, Long userId) {
+    Map<String, String> accessTokenMap = createAccessToken(userId);
+    Map<String, String> refreshTokenMap = createRefreshToken(userId);
+
+    String returnAccessToken = accessTokenMap.get("accessToken");
+    String returnAccessTokenExp = accessTokenMap.get("accessTokenExp");
+
+    String returnRefreshToken = refreshTokenMap.get("refreshToken");
+    String returnRefreshTokenExp = refreshTokenMap.get("refreshTokenExp");
+
+    LoginDTO loginDTO = new LoginDTO(userEntity.getId(), userEntity.getUserEmail(), userEntity.getUserName(), userEntity.getUserImg(), returnAccessToken, returnAccessTokenExp, returnRefreshToken, returnRefreshTokenExp);
+
+    System.out.println(returnAccessToken);
+
+    return loginDTO;
+  }
+
 }
