@@ -23,7 +23,7 @@ public class UserExceptionHandler{
     map.put("type", e.getHttpStatusType());
     map.put("code", Integer.toString(e.getHttpStatusCode()));
     map.put("message", e.getMessage());
-    System.out.println(map);
+
     return new ResponseEntity<>(map, responseHeaders, e.getHttpStatus());
   }
 

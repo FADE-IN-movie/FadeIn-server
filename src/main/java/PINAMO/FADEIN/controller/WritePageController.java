@@ -1,8 +1,8 @@
 package PINAMO.FADEIN.controller;
 
+import PINAMO.FADEIN.data.dto.movie.SearchPageDTO;
 import PINAMO.FADEIN.data.dto.movie.WritePageDTO;
 import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
-import PINAMO.FADEIN.data.dto.movie.WriteSearchDTO;
 import PINAMO.FADEIN.data.object.WriteContentObject;
 import PINAMO.FADEIN.data.object.WriteReviewObject;
 import PINAMO.FADEIN.service.WritePageService;
@@ -11,11 +11,12 @@ import exception.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utils.JwtUtil;
+import PINAMO.FADEIN.utils.JwtUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,13 +26,13 @@ import java.util.Map;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class WritePageController {
 
+  JwtUtil jwtUtil;
   private WritePageService writePageService;
   private final Logger LOGGER = LoggerFactory.getLogger(WritePageController.class);
 
-  JwtUtil jwtUtil = new JwtUtil();
-
   @Autowired
-  public WritePageController(WritePageService writePageService) {
+  public WritePageController(JwtUtil jwtUtil, WritePageService writePageService) {
+    this.jwtUtil = jwtUtil;
     this.writePageService = writePageService;
   }
 
@@ -115,18 +116,28 @@ public class WritePageController {
   }
 
   @GetMapping(value = "/search")
-  public WriteSearchDTO getSearchPage(@RequestParam String keyword,
+  public SearchPageDTO getWriteSearch(@RequestParam String keyword,
                                       @RequestParam(defaultValue = "1", required = false) int page) throws CustomException {
 
     LOGGER.info("GET SEARCH RESULTS IN WRITE PAGE.");
 
-    WriteSearchDTO writeSearchDTO = writePageService.getWriteSearch(keyword, page);
+    SearchPageDTO writeSearchDTO = writePageService.getWriteSearch(keyword, page);
     if (writeSearchDTO == null) {
       LOGGER.error("ERROR OCCUR IN GETTING SEARCH RESULTS.");
       throw new CustomException(Constants.ExceptionClass.CONTENT, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR");
     }
 
     return writeSearchDTO;
+  }
+
+  @GetMapping(value = "/search/length")
+  public int getWriteSearchLength(@RequestParam String keyword) throws CustomException {
+
+    LOGGER.info("GET SEARCH RESULTS LEGNTH IN WRITE PAGE.");
+
+    int writeSearchLength = writePageService.getWriteSearchLength(keyword);
+
+    return writeSearchLength;
   }
 
   @ExceptionHandler(value = CustomException.class)

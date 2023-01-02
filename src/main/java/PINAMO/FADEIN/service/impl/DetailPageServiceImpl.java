@@ -18,24 +18,22 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utils.MovieUtil;
-import utils.RestTemplateUtil;
+import PINAMO.FADEIN.utils.MovieUtil;
 
 import java.util.*;
 
 @Service
 public class DetailPageServiceImpl implements DetailPageService {
 
+  MovieUtil movieUtil;
   LikeDataHandler likeDataHandler;
   UserDataHandler userDataHandler;
   ContentDataHandler contentDataHandler;
   ContentGenreDataHandler contentGenreDataHandler;
 
-  RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
-  MovieUtil movieUtil = new MovieUtil();
-
   @Autowired
-  public DetailPageServiceImpl(LikeDataHandler likeDataHandler, UserDataHandler userDataHandler, ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler) {
+  public DetailPageServiceImpl(MovieUtil movieUtil, LikeDataHandler likeDataHandler, UserDataHandler userDataHandler, ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler) {
+    this.movieUtil = movieUtil;
     this.likeDataHandler = likeDataHandler;
     this.userDataHandler = userDataHandler;
     this.contentDataHandler = contentDataHandler;
@@ -44,50 +42,10 @@ public class DetailPageServiceImpl implements DetailPageService {
 
   @Override
   public DetailObject getDetail(String path, String type) {
-
     try {
-      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
+      DetailObject detailObject = movieUtil.getDetail(path, type);
 
-      int contentId = parser.getInt("id");
-      String title;
-      String originalTitle;
-      String poster = movieUtil.posterTransducer(parser.get("poster_path"), "poster");
-      String backdrop = movieUtil.posterTransducer(parser.get("backdrop_path"), "backdrop");
-      String releaseDate;
-      String country;
-      String runtime;
-      String certification;
-
-      ArrayList<String> genre = movieUtil.GenreTransducerByName(parser.getJSONArray("genres"));
-
-      if (type.equals("movie")) {
-        title = parser.getString("title");
-        originalTitle = parser.getString("original_title");
-        releaseDate = parser.getString("release_date");
-
-        country = movieUtil.countryTransducer(parser.getJSONArray("production_countries"), type);
-        certification = movieUtil.getMovieCertification(contentId);
-
-        runtime = Integer.toString(parser.getInt("runtime"));
-      }
-      else {
-        title = parser.getString("name");
-        originalTitle = parser.getString("original_name");
-        releaseDate = parser.getString("first_air_date");
-
-        country = movieUtil.countryTransducer(parser.getJSONArray("origin_country"), type);
-        certification = movieUtil.getTvCertification(contentId);
-
-        JSONArray runtimeArray = parser.getJSONArray("episode_run_time");
-        if (runtimeArray.length() != 0) runtime = Objects.toString(runtimeArray.get(0));
-        else runtime = null;
-      }
-
-      String rating = parser.get("vote_average").toString();
-      String overview = parser.getString("overview");
-
-      return new DetailObject(contentId, title, originalTitle, poster, backdrop, releaseDate, genre, country, runtime, certification, rating, overview);
+      return detailObject;
     }
     catch (Exception e) {
       return null;
@@ -97,64 +55,9 @@ public class DetailPageServiceImpl implements DetailPageService {
   @Override
   public List<CastObject> getCast(String path) {
     try {
-      path = path + "/" + "credits";
+      List<CastObject> castObjects = movieUtil.getCast(path);
 
-      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko", path);
-      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
-
-      JSONArray crews = parser.getJSONArray("crew");
-
-      List<CastObject> returnCast = new ArrayList<>();
-
-      int crewSize;
-      int crewLength = crews.length();
-
-      if (crewLength < 5) crewSize = crewLength;
-      else crewSize = 5;
-
-      if (crewSize != 0) {
-        for (int i = 0; i < crewSize; i++) {
-          JSONObject crew = (JSONObject) crews.get(i);
-
-          String job = crew.getString("job");
-
-          if (job.equals("Director")) {
-            String name = crew.getString("name");
-
-            String profile = movieUtil.profileImageTransducer(crew.get("profile_path"), crew.getInt("gender"));
-
-            CastObject castObject = new CastObject(name, job, profile);
-
-            returnCast.add(castObject);
-
-            break;
-          }
-        }
-      }
-
-      JSONArray casts = parser.getJSONArray("cast");
-
-      int castSize;
-      int castLength = casts.length();
-
-      if (castLength < 5) castSize = casts.length();
-      else castSize = 5;
-
-      if (castSize != 0) {
-        for (int i = 0; i < castSize; i++) {
-          JSONObject cast = (JSONObject) casts.get(i);
-
-          String name = cast.getString("name");
-          String role = cast.getString("character");
-
-          String profile = movieUtil.profileImageTransducer(cast.get("profile_path"), cast.getInt("gender"));
-
-          CastObject castObject = new CastObject(name, role, profile);
-
-          returnCast.add(castObject);
-        }
-      }
-      return returnCast;
+      return castObjects;
     }
     catch (Exception e) {
       return null;
@@ -164,44 +67,9 @@ public class DetailPageServiceImpl implements DetailPageService {
   @Override
   public List<ContentObject> getSimilarContents(String path) {
     try {
-      path = path + "/" + "recommendations";
+      List<ContentObject> contentObjects = movieUtil.getSimilarContents(path);
 
-      String requestURL = String.format("https://api.themoviedb.org/3/%s?api_key=929a001736172a3578c0d6bf3b3cbbc5&language=ko&page=1", path);
-      JSONObject parser = restTemplateUtil.GetRestTemplate(requestURL);
-
-      JSONArray similarMovies = parser.getJSONArray("results");
-
-      List<ContentObject> returnSimilarMovies = new ArrayList<>();
-
-      int similarContentSize;
-      int similarContentLength = similarMovies.length();
-
-      if (similarContentLength < 5) similarContentSize =  similarContentLength;
-      else similarContentSize = 5;
-
-      if (similarContentSize != 0) {
-        for (int i = 0; i < similarContentSize; i++) {
-          JSONObject movie = (JSONObject) similarMovies.get(i);
-
-          int id = movie.getInt("id");
-          String type = path.split("/")[0];
-          String title;
-
-          if (type.equals("movie")) title = movie.getString("title");
-          else title = movie.getString("name");
-
-          ArrayList<String> return_genres = movieUtil.GenreTransducer(movie.getJSONArray("genre_ids"));
-
-          String poster = movieUtil.posterTransducer(movie.get("poster_path"), "poster");
-
-          String overview = movie.getString("overview");
-
-          ContentObject ContentObject = new ContentObject(id, type, title, return_genres, poster, overview);
-
-          returnSimilarMovies.add(ContentObject);
-        }
-      }
-      return returnSimilarMovies;
+      return contentObjects;
     }
     catch (Exception e) {
       return null;

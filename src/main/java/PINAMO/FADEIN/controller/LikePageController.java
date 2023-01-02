@@ -1,30 +1,29 @@
 package PINAMO.FADEIN.controller;
 
 import PINAMO.FADEIN.data.dto.movie.LikePageDTO;
-import PINAMO.FADEIN.data.dto.movie.RankingPageDTO;
 import PINAMO.FADEIN.service.LikePageService;
-import PINAMO.FADEIN.service.RankingPageService;
 import exception.Constants;
 import exception.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import utils.JwtUtil;
+import PINAMO.FADEIN.utils.JwtUtil;
 
 @RestController
 @RequestMapping("/like")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LikePageController {
 
+  JwtUtil jwtUtil;
   private LikePageService likePageService;
   private final Logger LOGGER = LoggerFactory.getLogger(LikePageController.class);
 
-  JwtUtil jwtUtil = new JwtUtil();
-
   @Autowired
-  public LikePageController(LikePageService likePageService) {
+  public LikePageController(JwtUtil jwtUtil, LikePageService likePageService) {
+    this.jwtUtil = jwtUtil;
     this.likePageService = likePageService;
   }
 

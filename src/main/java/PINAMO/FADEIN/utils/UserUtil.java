@@ -1,13 +1,16 @@
-package utils;
+package PINAMO.FADEIN.utils;
 
 import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.user.LoginDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Service
 public class UserUtil {
 
-  JwtUtil jwtUtil = new JwtUtil();
+  JwtUtil jwtUtil;
 
   public LoginDTO issueTokens(UserEntity userEntity, Long userId) {
     Map<String, String> accessTokenMap = jwtUtil.createAccessToken(userId);

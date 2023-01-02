@@ -2,19 +2,13 @@ package PINAMO.FADEIN.service.impl;
 
 import PINAMO.FADEIN.data.Entity.ContentEntity;
 import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
-import PINAMO.FADEIN.data.Entity.LikeEntity;
-import PINAMO.FADEIN.data.Entity.UserEntity;
-import PINAMO.FADEIN.data.dto.movie.RankingPageDTO;
 import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.data.dto.movie.MainPageDTO;
 import PINAMO.FADEIN.handler.*;
 import PINAMO.FADEIN.service.MainPageService;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
-import utils.MovieUtil;
-import utils.RestTemplateUtil;
+import PINAMO.FADEIN.utils.MovieUtil;
 
 import java.util.*;
 
@@ -22,16 +16,15 @@ import java.util.*;
 @Service
 public class MainPageServiceImpl implements MainPageService {
 
-  MovieUtil movieUtil = new MovieUtil();
-  RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
-
+  MovieUtil movieUtil;
   ContentDataHandler contentDataHandler;
   ContentGenreDataHandler contentGenreDataHandler;
   UserDataHandler userDataHandler;
   LikeDataHandler likeDataHandler;
 
   @Autowired
-  public MainPageServiceImpl(ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler, UserDataHandler userDataHandler, LikeDataHandler likeDataHandler) {
+  public MainPageServiceImpl(MovieUtil movieUtil, ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler, UserDataHandler userDataHandler, LikeDataHandler likeDataHandler) {
+    this.movieUtil = movieUtil;
     this.likeDataHandler = likeDataHandler;
     this.contentDataHandler = contentDataHandler;
     this.contentGenreDataHandler = contentGenreDataHandler;
@@ -40,30 +33,31 @@ public class MainPageServiceImpl implements MainPageService {
 
   @Override
   public List<ContentObject> getPopular(String type) {
-    try {
+//    try {
       List<ContentObject> result = movieUtil.getMovies(type, "popular", 1,"");
       return result;
-    }
-    catch (Exception e) {
-      return null;
-    }
+//    }
+//    catch (Exception e) {
+//      return null;
+//    }
   }
 
   @Override
   public List<ContentObject> getTopRate(String type) {
-    try {
+//    try {
       List<ContentObject> result = movieUtil.getMovies(type, "top_rated", 1,"");
       return result;
-    }
-    catch (Exception e) {
-      return null;
-    }
+//    }
+//    catch (Exception e) {
+//      return null;
+//    }
   }
 
   @Override
   public List<ContentObject> getNowPlaying(String type) {
-    try {
+//    try {
       List<ContentObject> result;
+
       if (type.equals("movie")) {
         result = movieUtil.getMovies(type, "now_playing", 1, "");
         return result;
@@ -72,16 +66,15 @@ public class MainPageServiceImpl implements MainPageService {
         result = movieUtil.getMovies(type, "on_the_air", 1,"");
         return result;
       }
-    }
-    catch (Exception e) {
-      return null;
-    }
+//    }
+//    catch (Exception e) {
+//      return null;
+//    }
   }
 
   @Override
   public List<ContentObject> getPreference(Long userId, String type) {
-    try {
-
+//    try {
       String genre = contentGenreDataHandler.getReferenceGenreByUserId(userId, type);
 
       String genreId;
@@ -108,15 +101,15 @@ public class MainPageServiceImpl implements MainPageService {
       }
 
       return movieUtil.getMovies(type, "discover", 1, "&vote_count.gte=300" + sortBy + "&with_genres=" + genreId);
-    }
-    catch (Exception e) {
-      return null;
-    }
+//    }
+//    catch (Exception e) {
+//      return null;
+//    }
   }
 
   @Override
   public List<ContentObject> getRecommend(String type) {
-    try {
+//    try {
       List<ContentObject> result = new ArrayList<>();
 
       boolean isContent = contentDataHandler.isContentEntityByType(type);
@@ -145,10 +138,10 @@ public class MainPageServiceImpl implements MainPageService {
         result.add(ContentObject);
       }
       return result;
-    }
-    catch (Exception e) {
-      return null;
-    }
+//    }
+//    catch (Exception e) {
+//      return null;
+//    }
   }
 
   @Override

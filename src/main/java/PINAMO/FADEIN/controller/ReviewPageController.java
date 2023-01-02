@@ -7,13 +7,13 @@ import exception.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utils.JwtUtil;
+import PINAMO.FADEIN.utils.JwtUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,19 +23,13 @@ import java.util.Map;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ReviewPageController {
 
+  JwtUtil jwtUtil;
   private ReviewPageService reviewPageService;
   private final Logger LOGGER = LoggerFactory.getLogger(ReviewPageController.class);
 
-  JwtUtil jwtUtil = new JwtUtil();
-
-
-  public int getYear() {
-    Date now = new Date();
-    return Integer.parseInt(now.toString().split("-")[0]);
-  }
-
   @Autowired
-  public ReviewPageController(ReviewPageService reviewPageService) {
+  public ReviewPageController(JwtUtil jwtUtil, ReviewPageService reviewPageService) {
+    this.jwtUtil = jwtUtil;
     this.reviewPageService = reviewPageService;
   }
 

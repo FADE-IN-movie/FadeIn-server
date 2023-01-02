@@ -3,13 +3,19 @@ package PINAMO.FADEIN.service.impl;
 import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
 import PINAMO.FADEIN.data.dto.movie.SearchPageDTO;
 import PINAMO.FADEIN.service.SearchPageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utils.MovieUtil;
+import PINAMO.FADEIN.utils.MovieUtil;
 
 @Service
 public class SearchPageServiceImpl implements SearchPageService {
 
-  MovieUtil movieUtil = new MovieUtil();
+  MovieUtil movieUtil;
+
+  @Autowired
+  public SearchPageServiceImpl(MovieUtil movieUtil) {
+    this.movieUtil = movieUtil;
+  }
 
   @Override
   public SearchPageDTO getSearchPage(String type, String keyword, int page) {

@@ -2,22 +2,21 @@ package PINAMO.FADEIN.controller;
 
 import PINAMO.FADEIN.data.dto.movie.LikeDTO;
 import PINAMO.FADEIN.data.dto.movie.DetailPageDTO;
-import PINAMO.FADEIN.data.dto.movie.LikePageDTO;
 import PINAMO.FADEIN.data.object.CastObject;
 import PINAMO.FADEIN.data.object.DetailObject;
 import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.service.DetailPageService;
 import exception.Constants;
 import exception.CustomException;
-import io.jsonwebtoken.Claims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utils.JwtUtil;
+import PINAMO.FADEIN.utils.JwtUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,13 +27,13 @@ import java.util.Map;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class DetailPageController {
 
+  JwtUtil jwtUtil;
   private DetailPageService detailPageService;
   private final Logger LOGGER = LoggerFactory.getLogger(DetailPageController.class);
 
-  JwtUtil jwtUtil = new JwtUtil();
-
   @Autowired
-  public DetailPageController(DetailPageService detailPageService) {
+  public DetailPageController(JwtUtil jwtUtil, DetailPageService detailPageService) {
+    this.jwtUtil = jwtUtil;
     this.detailPageService = detailPageService;
   }
 

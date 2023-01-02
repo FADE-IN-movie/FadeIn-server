@@ -9,28 +9,28 @@ import exception.CustomException;
 import io.jsonwebtoken.Claims;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import utils.JwtUtil;
-import utils.UserUtil;
+import PINAMO.FADEIN.utils.JwtUtil;
+import PINAMO.FADEIN.utils.UserUtil;
 
 import java.net.URI;
 import java.util.Base64;
-import java.util.Date;
 import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-  UserUtil userUtil = new UserUtil();
-
+  UserUtil userUtil;
   UserDataHandler userDataHandler;
 
   @Autowired
-  public UserServiceImpl(UserDataHandler userDataHandler) {
+  public UserServiceImpl(UserUtil userUtil, UserDataHandler userDataHandler) {
+    this.userUtil = userUtil;
     this.userDataHandler = userDataHandler;
   }
 

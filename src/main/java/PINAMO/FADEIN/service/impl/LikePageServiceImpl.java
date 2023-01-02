@@ -3,19 +3,14 @@ package PINAMO.FADEIN.service.impl;
 import PINAMO.FADEIN.data.Entity.ContentEntity;
 import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
 import PINAMO.FADEIN.data.Entity.LikeEntity;
-import PINAMO.FADEIN.data.dto.movie.LikeDTO;
 import PINAMO.FADEIN.data.dto.movie.LikePageDTO;
-import PINAMO.FADEIN.data.dto.movie.RankingPageDTO;
 import PINAMO.FADEIN.data.object.ContentObject;
 import PINAMO.FADEIN.handler.ContentDataHandler;
 import PINAMO.FADEIN.handler.ContentGenreDataHandler;
 import PINAMO.FADEIN.handler.LikeDataHandler;
-import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.LikePageService;
-import PINAMO.FADEIN.service.RankingPageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utils.MovieUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +18,6 @@ import java.util.List;
 
 @Service
 public class LikePageServiceImpl implements LikePageService {
-
-  MovieUtil movieUtil =  new MovieUtil();
 
   LikeDataHandler likeDataHandler;
   ContentDataHandler contentDataHandler;

@@ -8,11 +8,12 @@ import exception.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utils.JwtUtil;
+import PINAMO.FADEIN.utils.JwtUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,13 +24,13 @@ import java.util.Map;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MainPageController {
 
+  JwtUtil jwtUtil;
   private MainPageService mainPageService;
   private final Logger LOGGER = LoggerFactory.getLogger(MainPageController.class);
 
-  JwtUtil jwtUtil = new JwtUtil();
-
   @Autowired
-  public MainPageController(MainPageService mainPageService) {
+  public MainPageController(JwtUtil jwtUtil, MainPageService mainPageService) {
+    this.jwtUtil= jwtUtil;
     this.mainPageService = mainPageService;
   }
 

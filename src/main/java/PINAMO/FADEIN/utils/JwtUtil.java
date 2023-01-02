@@ -1,10 +1,9 @@
-package utils;
+package PINAMO.FADEIN.utils;
 
 import io.jsonwebtoken.*;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Base64;
@@ -12,9 +11,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class JwtUtil {
-//  @Value("${jwt.security.key}")
-  private static final String secretKey = "awdsawds";
+
+  @Value("${jwt.security.key}")
+  private String secretKey;
 
   public Date createExp(Integer time) {
     Date now = new Date();
@@ -79,7 +80,6 @@ public class JwtUtil {
     }
   }
 
-  @Bean
   public Claims parseJwtToken(String accessToken) {
     try{
       String jwt = accessToken.split(" ")[1];
@@ -97,7 +97,6 @@ public class JwtUtil {
     }
   }
 
-  @Bean
   public int getUserIdInJwtToken(String accessToken) {
     try {
       String jwt = accessToken.split(" ")[1];

@@ -1,40 +1,32 @@
 package PINAMO.FADEIN.service.impl;
 
-import PINAMO.FADEIN.data.Entity.ContentEntity;
-import PINAMO.FADEIN.data.Entity.ContentGenreEntity;
 import PINAMO.FADEIN.data.Entity.ReviewEntity;
-import PINAMO.FADEIN.data.Entity.UserEntity;
 import PINAMO.FADEIN.data.dto.movie.ReviewPageDTO;
-import PINAMO.FADEIN.data.dto.movie.WriteReviewDTO;
 import PINAMO.FADEIN.data.object.ReviewObject;
-import PINAMO.FADEIN.data.object.WriteContentObject;
-import PINAMO.FADEIN.data.object.WriteReviewObject;
 import PINAMO.FADEIN.handler.ContentDataHandler;
 import PINAMO.FADEIN.handler.ContentGenreDataHandler;
 import PINAMO.FADEIN.handler.ReviewDataHandler;
 import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.ReviewPageService;
-import PINAMO.FADEIN.service.WritePageService;
-import org.json.JSONObject;
+import PINAMO.FADEIN.utils.MovieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utils.MovieUtil;
-import utils.RestTemplateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ReviewPageServiceImpl implements ReviewPageService {
 
+  MovieUtil movieUtil;
   UserDataHandler userDataHandler;
   ContentDataHandler contentDataHandler;
   ContentGenreDataHandler contentGenreDataHandler;
   ReviewDataHandler reviewDataHandler;
 
   @Autowired
-  public ReviewPageServiceImpl(UserDataHandler userDataHandler, ReviewDataHandler reviewDataHandler, ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler) {
+  public ReviewPageServiceImpl(MovieUtil movieUtil, UserDataHandler userDataHandler, ReviewDataHandler reviewDataHandler, ContentDataHandler contentDataHandler, ContentGenreDataHandler contentGenreDataHandler) {
+    this.movieUtil = movieUtil;
     this.userDataHandler = userDataHandler;
     this.reviewDataHandler = reviewDataHandler;
     this.contentDataHandler = contentDataHandler;

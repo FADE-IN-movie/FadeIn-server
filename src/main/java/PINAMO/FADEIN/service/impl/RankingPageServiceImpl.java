@@ -1,20 +1,24 @@
 package PINAMO.FADEIN.service.impl;
 
-import PINAMO.FADEIN.controller.RankingPageController;
 import PINAMO.FADEIN.data.dto.movie.RankingPageDTO;
-import PINAMO.FADEIN.data.dto.movie.SearchLengthDTO;
-import PINAMO.FADEIN.data.dto.movie.SearchPageDTO;
+import PINAMO.FADEIN.handler.ContentDataHandler;
+import PINAMO.FADEIN.handler.ContentGenreDataHandler;
+import PINAMO.FADEIN.handler.LikeDataHandler;
+import PINAMO.FADEIN.handler.UserDataHandler;
 import PINAMO.FADEIN.service.RankingPageService;
-import PINAMO.FADEIN.service.SearchPageService;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utils.MovieUtil;
-import utils.RestTemplateUtil;
+import PINAMO.FADEIN.utils.MovieUtil;
 
 @Service
 public class RankingPageServiceImpl implements RankingPageService {
 
-  MovieUtil movieUtil =  new MovieUtil();
+  MovieUtil movieUtil;
+
+  @Autowired
+  public RankingPageServiceImpl(MovieUtil movieUtil) {
+    this.movieUtil = movieUtil;
+  }
 
   @Override
   public RankingPageDTO getRankingPage(String genre, String type, String sortBy, int page) {
