@@ -617,12 +617,18 @@ public class MovieUtil {
   }
 
   public int getWriteSearchLength(String keyword) {
-    String requestURL = String.format("https://api.themoviedb.org/3/search/multi?api_key=%s&query=%s&language=ko&page=%d", tmdbKey, keyword, 1);
-    JSONObject parser = GetRestTemplate(requestURL);
+    int writeSearchLength = 0;
 
-    int total = parser.getInt("total_results");
+    for (int i=0; i<2; i++) {
+      String requestURL = String.format("https://api.themoviedb.org/3/search/tv?api_key=%s&query=%s&language=ko&page=%d", tmdbKey, keyword, 1);
+      JSONObject parser = GetRestTemplate(requestURL);
 
-    return total;
+      int total = parser.getInt("total_results");
+
+      writeSearchLength += total;
+    }
+    
+    return writeSearchLength;
   }
 
   public Map<ContentEntity,ArrayList<String>> getContentByEntity(String type, String path, String isRecommended) {
