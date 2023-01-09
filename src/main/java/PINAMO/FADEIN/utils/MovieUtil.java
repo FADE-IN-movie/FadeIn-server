@@ -617,18 +617,30 @@ public class MovieUtil {
   }
 
   public int getWriteSearchLength(String keyword) {
-    int writeSearchLength = 0;
 
-    for (int i=0; i<2; i++) {
-      String requestURL = String.format("https://api.themoviedb.org/3/search/tv?api_key=%s&query=%s&language=ko&page=%d", tmdbKey, keyword, 1);
-      JSONObject parser = GetRestTemplate(requestURL);
+    String query = "&query=" + keyword;
 
-      int total = parser.getInt("total_results");
+    String requestURL = String.format("https://api.themoviedb.org/3/search/movie?api_key=%s&language=ko%s&page=1", tmdbKey, query);
+    JSONObject parser = GetRestTemplate(requestURL);
 
-      writeSearchLength += total;
+    Object Object = parser.get("total_results");
+    int movieLength = 0;
+
+    if (Object != null) {
+      movieLength = (int) Object;
+    }
+
+    requestURL = String.format("https://api.themoviedb.org/3/search/tv?api_key=%s&language=ko%s&page=1", tmdbKey, query);
+    parser = GetRestTemplate(requestURL);
+
+    Object = parser.get("total_results");
+    int tvLength = 0;
+
+    if (Object != null) {
+      tvLength = (int) Object;
     }
     
-    return writeSearchLength;
+    return movieLength+tvLength;
   }
 
   public Map<ContentEntity,ArrayList<String>> getContentByEntity(String type, String path, String isRecommended) {
